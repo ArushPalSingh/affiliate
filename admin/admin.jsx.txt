@@ -1,0 +1,764 @@
+import { useState, useEffect, useCallback } from "react";
+
+// ─── CONSTANTS ───────────────────────────────────────────────
+const ADMIN_PASSWORD_HASH_KEY = "dz_admin_pw_hash";
+const DEFAULT_PASSWORD = "DeliveryZone2025!";
+const SESSION_KEY = "dz_admin_session";
+const SESSION_DURATION = 30 * 60 * 1000; // 30 min
+
+// Simple hash function (for demo; in production use bcrypt server-side)
+async function hashPassword(pw) {
+  const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(pw));
+  return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, "0")).join("");
+}
+
+function todayStr() {
+  return new Date().toISOString().split("T")[0];
+}
+function fmtDate(d) {
+  return new Date(d + "T00:00:00").toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" });
+}
+
+const SAMPLE = [
+  { id: 1, name: "Sony WH-1000XM5", category: "Electronics", price: "$279.99", originalPrice: "$399.99", rating: 4.8, image: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=600&q=80", link: "#", description: "Industry-leading noise cancellation with 30-hour battery life.", featured: true },
+  { id: 2, name: "Ember Temperature Control Mug", category: "Home & Living", price: "$99.95", originalPrice: "$129.99", rating: 4.6, image: "https://images.unsplash.com/photo-1514228742587-6b1558fcca3d?w=600&q=80", link: "#", description: "Keep your coffee at the perfect temperature all morning.", featured: false },
+  { id: 3, name: "Nike Air Zoom Pegasus 41", category: "Fashion", price: "$130.00", originalPrice: "", rating: 4.5, image: "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=600&q=80", link: "#", description: "Responsive cushioning for everyday training runs.", featured: false },
+  { id: 4, name: "Anker 65W USB-C Charger", category: "Electronics", price: "$35.99", originalPrice: "$55.99", rating: 4.7, image: "https://images.unsplash.com/photo-1625772452859-1c03d5bf1137?w=600&q=80", link: "#", description: "Charge laptop, phone and tablet simultaneously.", featured: false },
+];
+
+// ─── STYLES ──────────────────────────────────────────────────
+const S = {
+  app: { fontFamily: "'DM Sans', sans-serif", background: "#0D1B2A", minHeight: "100vh", color: "#F0F6FF" },
+  // Login
+  loginWrap: { minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", background: "radial-gradient(ellipse at 60% 20%, rgba(245,158,11,0.08) 0%, transparent 60%), #0D1B2A", padding: "1rem" },
+  loginCard: { background: "#1A2F44", border: "1px solid rgba(245,158,11,0.15)", borderRadius: 20, padding: "2.5rem", width: "100%", maxWidth: 400, boxShadow: "0 0 60px rgba(0,0,0,0.5)" },
+  logo: { fontFamily: "'Syne', sans-serif", fontWeight: 800, fontSize: "1.8rem", color: "#F0F6FF", marginBottom: "0.2rem" },
+  logoSpan: { color: "#F59E0B" },
+  loginSub: { color: "#8BA4BC", fontSize: "0.9rem", marginBottom: "2rem" },
+  label: { display: "block", fontSize: "0.75rem", fontWeight: 600, letterSpacing: "0.08em", textTransform: "uppercase", color: "#8BA4BC", marginBottom: "0.4rem" },
+  input: { width: "100%", background: "#112236", border: "1px solid rgba(245,158,11,0.15)", color: "#F0F6FF", padding: "0.7rem 1rem", borderRadius: 10, fontSize: "0.95rem", outline: "none", boxSizing: "border-box", fontFamily: "inherit", transition: "border-color 0.2s" },
+  btn: { background: "#F59E0B", color: "#000", fontFamily: "'Syne', sans-serif", fontWeight: 700, fontSize: "0.95rem", padding: "0.8rem", borderRadius: 999, border: "none", cursor: "pointer", width: "100%", transition: "background 0.2s, transform 0.2s" },
+  btnSm: { background: "#F59E0B", color: "#000", fontFamily: "'Syne', sans-serif", fontWeight: 700, fontSize: "0.8rem", padding: "0.5rem 1.1rem", borderRadius: 999, border: "none", cursor: "pointer", transition: "background 0.2s" },
+  btnOutline: { background: "transparent", color: "#F59E0B", fontFamily: "'Syne', sans-serif", fontWeight: 700, fontSize: "0.8rem", padding: "0.5rem 1.1rem", borderRadius: 999, border: "2px solid #F59E0B", cursor: "pointer" },
+  btnDanger: { background: "transparent", color: "#ef4444", fontFamily: "inherit", fontWeight: 600, fontSize: "0.8rem", padding: "0.4rem 0.9rem", borderRadius: 8, border: "1px solid rgba(239,68,68,0.3)", cursor: "pointer" },
+  error: { background: "rgba(239,68,68,0.1)", border: "1px solid rgba(239,68,68,0.3)", color: "#fca5a5", borderRadius: 8, padding: "0.6rem 0.9rem", fontSize: "0.85rem", marginBottom: "1rem" },
+  success: { background: "rgba(34,197,94,0.1)", border: "1px solid rgba(34,197,94,0.3)", color: "#86efac", borderRadius: 8, padding: "0.6rem 0.9rem", fontSize: "0.85rem", marginBottom: "1rem" },
+  // Shell
+  shell: { display: "flex", minHeight: "100vh" },
+  sidebar: { width: 240, background: "#112236", borderRight: "1px solid rgba(245,158,11,0.1)", display: "flex", flexDirection: "column", padding: "1.5rem 1rem", flexShrink: 0 },
+  sidebarLogo: { fontFamily: "'Syne', sans-serif", fontWeight: 800, fontSize: "1.3rem", color: "#F0F6FF", marginBottom: "2rem", paddingLeft: "0.5rem" },
+  navItem: { display: "flex", alignItems: "center", gap: "0.7rem", padding: "0.65rem 0.8rem", borderRadius: 10, cursor: "pointer", fontSize: "0.9rem", fontWeight: 500, color: "#8BA4BC", marginBottom: "0.2rem", border: "none", background: "transparent", width: "100%", textAlign: "left", transition: "all 0.15s" },
+  navItemActive: { background: "rgba(245,158,11,0.12)", color: "#F59E0B" },
+  main: { flex: 1, padding: "2rem", overflowY: "auto" },
+  pageTitle: { fontFamily: "'Syne', sans-serif", fontWeight: 800, fontSize: "1.7rem", marginBottom: "0.3rem" },
+  pageSub: { color: "#8BA4BC", fontSize: "0.9rem", marginBottom: "2rem" },
+  card: { background: "#1A2F44", border: "1px solid rgba(245,158,11,0.1)", borderRadius: 14, padding: "1.5rem", marginBottom: "1.5rem" },
+  grid2: { display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))", gap: "1rem" },
+  badge: { display: "inline-block", background: "rgba(245,158,11,0.15)", color: "#F59E0B", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.06em", textTransform: "uppercase", padding: "0.2rem 0.6rem", borderRadius: 6 },
+  badgeGreen: { display: "inline-block", background: "rgba(34,197,94,0.1)", color: "#86efac", fontSize: "0.72rem", fontWeight: 700, padding: "0.2rem 0.6rem", borderRadius: 6 },
+  badgeGray: { display: "inline-block", background: "rgba(255,255,255,0.05)", color: "#8BA4BC", fontSize: "0.72rem", fontWeight: 700, padding: "0.2rem 0.6rem", borderRadius: 6 },
+  tableWrap: { overflowX: "auto" },
+  table: { width: "100%", borderCollapse: "collapse", fontSize: "0.88rem" },
+  th: { textAlign: "left", padding: "0.7rem 1rem", borderBottom: "1px solid rgba(245,158,11,0.1)", color: "#8BA4BC", fontSize: "0.75rem", fontWeight: 600, letterSpacing: "0.06em", textTransform: "uppercase" },
+  td: { padding: "0.8rem 1rem", borderBottom: "1px solid rgba(255,255,255,0.04)", verticalAlign: "middle" },
+  // Form
+  formGrid: { display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem" },
+  formField: { display: "flex", flexDirection: "column", gap: "0.4rem" },
+  textarea: { width: "100%", background: "#112236", border: "1px solid rgba(245,158,11,0.15)", color: "#F0F6FF", padding: "0.7rem 1rem", borderRadius: 10, fontSize: "0.9rem", outline: "none", boxSizing: "border-box", fontFamily: "inherit", minHeight: 80, resize: "vertical" },
+  select: { width: "100%", background: "#112236", border: "1px solid rgba(245,158,11,0.15)", color: "#F0F6FF", padding: "0.7rem 1rem", borderRadius: 10, fontSize: "0.9rem", outline: "none", boxSizing: "border-box", fontFamily: "inherit" },
+  // Code
+  codeBox: { background: "#060f19", border: "1px solid rgba(245,158,11,0.1)", borderRadius: 10, padding: "1rem 1.2rem", fontSize: "0.8rem", fontFamily: "monospace", color: "#93c5fd", overflowX: "auto", whiteSpace: "pre-wrap", wordBreak: "break-all" },
+  // Modal overlay
+  overlay: { position: "fixed", inset: 0, background: "rgba(5,12,22,0.88)", backdropFilter: "blur(6px)", zIndex: 500, display: "flex", alignItems: "center", justifyContent: "center", padding: "1rem" },
+  modal: { background: "#1A2F44", border: "1px solid rgba(245,158,11,0.15)", borderRadius: 18, width: "100%", maxWidth: 560, maxHeight: "90vh", overflowY: "auto" },
+  modalHeader: { display: "flex", alignItems: "center", justifyContent: "space-between", padding: "1.3rem 1.5rem", borderBottom: "1px solid rgba(245,158,11,0.1)" },
+  modalBody: { padding: "1.5rem" },
+};
+
+// ─── STORAGE HELPERS ──────────────────────────────────────────
+async function storageGet(key) {
+  try { const r = await window.storage.get(key); return r ? JSON.parse(r.value) : null; } catch { return null; }
+}
+async function storageSet(key, value) {
+  try { await window.storage.set(key, JSON.stringify(value)); return true; } catch { return false; }
+}
+async function storageList(prefix) {
+  try { const r = await window.storage.list(prefix); return r ? r.keys : []; } catch { return []; }
+}
+async function storageDelete(key) {
+  try { await window.storage.delete(key); return true; } catch { return false; }
+}
+
+// ─── SESSION ──────────────────────────────────────────────────
+function getSession() {
+  try {
+    const s = JSON.parse(sessionStorage.getItem(SESSION_KEY) || "null");
+    if (s && Date.now() - s.ts < SESSION_DURATION) return s;
+    sessionStorage.removeItem(SESSION_KEY);
+    return null;
+  } catch { return null; }
+}
+function setSession() {
+  sessionStorage.setItem(SESSION_KEY, JSON.stringify({ ts: Date.now() }));
+}
+function clearSession() {
+  sessionStorage.removeItem(SESSION_KEY);
+}
+
+// ─── PAGE GENERATOR ───────────────────────────────────────────
+function generateHTML(snapshot) {
+  const { date, products } = snapshot;
+  const cats = [...new Set(products.map(p => p.category))];
+  const featured = products.find(p => p.featured) || products[0];
+
+  const cardHTML = (p) => {
+    const disc = p.originalPrice ? Math.round((1 - parseFloat(p.price.replace(/[^0-9.]/g,"")) / parseFloat(p.originalPrice.replace(/[^0-9.]/g,""))) * 100) : 0;
+    const stars = "★".repeat(Math.floor(p.rating)) + (p.rating % 1 >= 0.5 ? "½" : "") + "☆".repeat(5 - Math.floor(p.rating) - (p.rating % 1 >= 0.5 ? 1 : 0));
+    return `<div class="card-wrap" data-cat="${p.category}"><div class="product-card">${p.image ? `<img class="card-img" src="${p.image}" alt="${p.name}" loading="lazy"/>` : `<div class="card-img-ph">📦</div>`}<div class="card-body"><div class="card-cat">${p.category}</div><div class="card-name">${p.name}</div>${p.description ? `<div class="card-desc">${p.description}</div>` : ""}<div class="card-rating"><span class="stars">${stars}</span><span class="rn">${p.rating.toFixed(1)}</span></div><div class="card-footer"><div class="card-price"><span class="price-now">${p.price}</span>${p.originalPrice ? `<span class="price-old">${p.originalPrice}</span>` : ""}</div><a href="${p.link}" target="_blank" rel="noopener noreferrer sponsored" class="card-btn">Get Deal</a></div></div></div>${disc > 5 ? `<span class="badge">${disc}% OFF</span>` : ""}</div>`;
+  };
+
+  return `<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>DeliveryZone — ${fmtDate(date)}</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--accent:#F59E0B;--bg:#0D1B2A;--bg2:#112236;--surface:#1A2F44;--text:#F0F6FF;--muted:#8BA4BC;--border:rgba(245,158,11,0.12)}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+.nav{position:sticky;top:0;z-index:100;background:rgba(13,27,42,0.9);backdrop-filter:blur(14px);border-bottom:1px solid var(--border)}
+.nav-inner{max-width:1280px;margin:0 auto;padding:0 2rem;height:64px;display:flex;align-items:center;gap:2rem}
+.logo{font-family:'Syne',sans-serif;font-weight:800;font-size:1.4rem;color:var(--text);text-decoration:none}
+.logo span{color:var(--accent)}
+.nav-search{flex:1;max-width:380px;margin-left:auto;position:relative}
+.nav-search input{width:100%;background:var(--surface);border:1px solid var(--border);color:var(--text);padding:.55rem 1rem .55rem 2.5rem;border-radius:999px;font-size:.9rem;font-family:inherit;outline:none}
+.nav-search input:focus{border-color:var(--accent)}
+.nav-search svg{position:absolute;left:.8rem;top:50%;transform:translateY(-50%);color:var(--muted);pointer-events:none}
+.snap-badge{background:rgba(245,158,11,0.12);border:1px solid rgba(245,158,11,0.25);color:var(--accent);font-size:.75rem;font-weight:600;padding:.25rem .8rem;border-radius:999px;margin-left:auto}
+.hero{max-width:1280px;margin:0 auto;padding:5rem 2rem 3rem;position:relative;overflow:hidden}
+.hero-tag{display:inline-flex;background:rgba(245,158,11,0.1);border:1px solid rgba(245,158,11,0.3);color:var(--accent);font-size:.78rem;font-weight:600;padding:.28rem .8rem;border-radius:999px;letter-spacing:.05em;margin-bottom:1.5rem}
+.hero h1{font-family:'Syne',sans-serif;font-size:clamp(3rem,7vw,6rem);font-weight:800;line-height:1.0;letter-spacing:-.03em;margin-bottom:1.2rem}
+.hero h1 em{font-style:normal;color:var(--accent)}
+.hero p{color:var(--muted);font-size:1.05rem;max-width:420px;line-height:1.7;margin-bottom:2rem}
+.cta{display:inline-flex;align-items:center;gap:.5rem;background:var(--accent);color:#000;font-family:'Syne',sans-serif;font-weight:700;font-size:.9rem;padding:.8rem 1.8rem;border-radius:999px;text-decoration:none;box-shadow:0 4px 20px rgba(245,158,11,.3)}
+.glow{position:absolute;top:-80px;right:-150px;width:500px;height:500px;background:radial-gradient(circle,rgba(245,158,11,.07) 0%,transparent 65%);pointer-events:none}
+.section{max-width:1280px;margin:0 auto;padding:2.5rem 2rem}
+.sec-label{font-size:.72rem;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--accent);margin-bottom:1.2rem}
+.cats{display:flex;flex-wrap:wrap;gap:.5rem;margin-bottom:2rem}
+.cat-btn{background:var(--surface);color:var(--muted);border:1px solid var(--border);padding:.4rem 1rem;border-radius:999px;font-size:.83rem;font-family:inherit;cursor:pointer;transition:all .2s}
+.cat-btn.active,.cat-btn:hover{background:var(--accent);color:#000;border-color:var(--accent)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:1.2rem}
+.card-wrap{position:relative}
+.product-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;overflow:hidden;transition:transform .25s,box-shadow .25s,border-color .25s;height:100%}
+.product-card:hover{transform:translateY(-5px);box-shadow:0 0 30px rgba(245,158,11,.18);border-color:rgba(245,158,11,.3)}
+.card-img{width:100%;height:190px;object-fit:cover;display:block}
+.card-img-ph{width:100%;height:190px;background:linear-gradient(135deg,#162e45,#1f3a52);display:flex;align-items:center;justify-content:center;font-size:2.5rem}
+.card-body{padding:1.1rem;display:flex;flex-direction:column;gap:.45rem}
+.card-cat{font-size:.7rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--accent)}
+.card-name{font-family:'Syne',sans-serif;font-size:1rem;font-weight:700;line-height:1.3}
+.card-desc{font-size:.83rem;color:var(--muted);line-height:1.55}
+.card-rating{display:flex;align-items:center;gap:.35rem}
+.stars{color:var(--accent)}
+.rn{color:var(--muted);font-size:.78rem}
+.card-footer{display:flex;align-items:center;justify-content:space-between;gap:.6rem;margin-top:.3rem}
+.card-price{display:flex;align-items:baseline;gap:.4rem}
+.price-now{font-family:'Syne',sans-serif;font-weight:800;font-size:1.2rem;color:var(--accent)}
+.price-old{font-size:.82rem;color:#4A6580;text-decoration:line-through}
+.card-btn{background:var(--accent);color:#000;font-family:'Syne',sans-serif;font-weight:700;font-size:.78rem;padding:.5rem 1rem;border-radius:999px;text-decoration:none;flex-shrink:0;transition:background .2s}
+.card-btn:hover{background:#D97706}
+.badge{position:absolute;top:.7rem;left:.7rem;background:var(--accent);color:#000;font-size:.68rem;font-weight:800;letter-spacing:.05em;text-transform:uppercase;padding:.22rem .55rem;border-radius:6px}
+.hidden{display:none}
+.footer{background:var(--bg);border-top:1px solid var(--border);padding:2rem;margin-top:3rem;text-align:center;color:#4A6580;font-size:.82rem}
+@media(max-width:640px){.hero h1{font-size:2.8rem}.section{padding:1.5rem}}
+</style>
+</head>
+<body>
+<nav class="nav"><div class="nav-inner">
+  <a href="#" class="logo">Delivery<span>Zone</span></a>
+  <div class="nav-search">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+    <input type="text" id="searchInput" placeholder="Search products…"/>
+  </div>
+  <span class="snap-badge">📅 ${fmtDate(date)}</span>
+</div></nav>
+
+<section class="hero">
+  <div class="hero-tag">✦ ${fmtDate(date)} Edition</div>
+  <h1>Discover<br/><em>Premium</em><br/>Products</h1>
+  <p>Curated deals updated daily — click, compare, and save.</p>
+  <a href="#products" class="cta">Explore Deals →</a>
+  <div class="glow"></div>
+</section>
+
+<section class="section" id="products">
+  <div class="sec-label">Browse by Category</div>
+  <div class="cats">
+    <button class="cat-btn active" data-cat="all">All (${products.length})</button>
+    ${cats.map(c => `<button class="cat-btn" data-cat="${c}">${c}</button>`).join("")}
+  </div>
+  <div class="grid" id="grid">
+    ${products.map(cardHTML).join("")}
+  </div>
+</section>
+
+<footer class="footer">
+  <strong style="color:#F0F6FF;font-family:'Syne',sans-serif">DeliveryZone</strong><br/>
+  This site contains affiliate links. We may earn a commission at no extra cost to you.<br/>
+  Snapshot generated: ${fmtDate(date)} · © ${new Date().getFullYear()} DeliveryZone
+</footer>
+
+<script>
+const cards = document.querySelectorAll('.card-wrap');
+const search = document.getElementById('searchInput');
+const catBtns = document.querySelectorAll('.cat-btn');
+let activeCat = 'all', searchQ = '';
+
+function filter() {
+  cards.forEach(c => {
+    const cat = c.dataset.cat;
+    const txt = c.innerText.toLowerCase();
+    const matchCat = activeCat === 'all' || cat === activeCat;
+    const matchSearch = !searchQ || txt.includes(searchQ);
+    c.classList.toggle('hidden', !(matchCat && matchSearch));
+  });
+}
+catBtns.forEach(b => b.addEventListener('click', () => {
+  catBtns.forEach(x => x.classList.remove('active'));
+  b.classList.add('active');
+  activeCat = b.dataset.cat;
+  filter();
+}));
+search.addEventListener('input', e => { searchQ = e.target.value.toLowerCase(); filter(); });
+</script>
+</body>
+</html>`;
+}
+
+// ─── LOGIN PAGE ───────────────────────────────────────────────
+function LoginPage({ onLogin }) {
+  const [pw, setPw] = useState("");
+  const [err, setErr] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [attempts, setAttempts] = useState(0);
+  const [locked, setLocked] = useState(false);
+
+  useEffect(() => {
+    const link = document.createElement("link");
+    link.rel = "preconnect"; link.href = "https://fonts.googleapis.com";
+    document.head.appendChild(link);
+    const link2 = document.createElement("link");
+    link2.rel = "stylesheet";
+    link2.href = "https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@300;400;500&display=swap";
+    document.head.appendChild(link2);
+  }, []);
+
+  async function handleLogin(e) {
+    e.preventDefault();
+    if (locked) return;
+    if (!pw) { setErr("Please enter your password."); return; }
+    setLoading(true); setErr("");
+    await new Promise(r => setTimeout(r, 400)); // slight delay for UX
+    const hash = await hashPassword(pw);
+    // Load stored hash or use default
+    let storedHash = await storageGet(ADMIN_PASSWORD_HASH_KEY);
+    if (!storedHash) {
+      storedHash = await hashPassword(DEFAULT_PASSWORD);
+      await storageSet(ADMIN_PASSWORD_HASH_KEY, storedHash);
+    }
+    if (hash === storedHash) {
+      setSession();
+      onLogin();
+    } else {
+      const newAttempts = attempts + 1;
+      setAttempts(newAttempts);
+      if (newAttempts >= 5) {
+        setLocked(true);
+        setErr("Too many failed attempts. Session locked for 5 minutes.");
+        setTimeout(() => { setLocked(false); setAttempts(0); }, 5 * 60 * 1000);
+      } else {
+        setErr(`Incorrect password. ${5 - newAttempts} attempt(s) remaining.`);
+      }
+    }
+    setLoading(false);
+  }
+
+  return (
+    <div style={S.loginWrap}>
+      <div style={S.loginCard}>
+        <div style={S.logo}>Delivery<span style={S.logoSpan}>Zone</span></div>
+        <div style={{ fontFamily: "'Syne', sans-serif", fontWeight: 700, color: "#8BA4BC", fontSize: "0.85rem", marginBottom: "0.3rem" }}>Admin Dashboard</div>
+        <div style={S.loginSub}>Sign in to manage products and snapshots</div>
+
+        {err && <div style={S.error}>🔒 {err}</div>}
+
+        <form onSubmit={handleLogin}>
+          <label style={{ ...S.label, marginTop: "1rem" }}>Password</label>
+          <input
+            type="password"
+            style={{ ...S.input, marginBottom: "1.5rem" }}
+            value={pw}
+            onChange={e => setPw(e.target.value)}
+            placeholder="Enter admin password"
+            autoFocus
+            disabled={locked}
+          />
+          <button type="submit" style={{ ...S.btn, opacity: loading || locked ? 0.7 : 1 }} disabled={loading || locked}>
+            {loading ? "Verifying…" : locked ? "Locked" : "Sign In →"}
+          </button>
+        </form>
+
+        <div style={{ marginTop: "1.5rem", padding: "1rem", background: "rgba(245,158,11,0.06)", borderRadius: 10, border: "1px solid rgba(245,158,11,0.12)" }}>
+          <div style={{ fontSize: "0.75rem", color: "#8BA4BC", lineHeight: 1.7 }}>
+            <strong style={{ color: "#F59E0B" }}>🔐 Security</strong><br/>
+            Default password: <code style={{ color: "#F0F6FF" }}>DeliveryZone2025!</code><br/>
+            Change it in Settings after login.
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ─── PRODUCT FORM ─────────────────────────────────────────────
+function ProductForm({ initial, onSave, onCancel }) {
+  const blank = { name: "", category: "", price: "", originalPrice: "", rating: "4.5", image: "", link: "", description: "", featured: false };
+  const [f, setF] = useState(initial || blank);
+  const [err, setErr] = useState("");
+
+  function set(k, v) { setF(p => ({ ...p, [k]: v })); }
+
+  function submit() {
+    if (!f.name || !f.category || !f.price || !f.link) { setErr("Name, Category, Price and Affiliate Link are required."); return; }
+    onSave({ ...f, id: f.id || Date.now(), rating: parseFloat(f.rating) || 4.0 });
+  }
+
+  return (
+    <div>
+      {err && <div style={S.error}>{err}</div>}
+      <div style={S.formGrid}>
+        {[["Product Name *", "name", "text", "Sony WH-1000XM5…"], ["Category *", "category", "text", "Electronics, Fashion…"],
+          ["Price *", "price", "text", "$199.99"], ["Original Price", "originalPrice", "text", "$349.99 (optional)"],
+          ["Rating (1–5)", "rating", "number", "4.5"], ["Image URL", "image", "url", "https://…"]].map(([lbl, key, type, ph]) => (
+          <div key={key} style={S.formField}>
+            <label style={S.label}>{lbl}</label>
+            <input style={S.input} type={type} placeholder={ph} value={f[key]}
+              onChange={e => set(key, e.target.value)} min={type === "number" ? 1 : undefined} max={type === "number" ? 5 : undefined} step={type === "number" ? "0.1" : undefined} />
+          </div>
+        ))}
+      </div>
+      <div style={{ ...S.formField, marginTop: "1rem" }}>
+        <label style={S.label}>Affiliate Link *</label>
+        <input style={S.input} type="url" placeholder="https://amzn.to/…" value={f.link} onChange={e => set("link", e.target.value)} />
+      </div>
+      <div style={{ ...S.formField, marginTop: "1rem" }}>
+        <label style={S.label}>Description</label>
+        <textarea style={S.textarea} placeholder="Why you'll love this product…" value={f.description} onChange={e => set("description", e.target.value)} />
+      </div>
+      <label style={{ display: "flex", alignItems: "center", gap: "0.6rem", marginTop: "1rem", cursor: "pointer", fontSize: "0.88rem", color: "#8BA4BC" }}>
+        <input type="checkbox" checked={f.featured} onChange={e => set("featured", e.target.checked)} /> Mark as Featured Product
+      </label>
+      <div style={{ display: "flex", gap: "0.8rem", marginTop: "1.5rem" }}>
+        <button style={S.btn} onClick={submit}>{initial ? "Save Changes" : "Add Product"}</button>
+        <button style={{ ...S.btnOutline, padding: "0.8rem 1.5rem" }} onClick={onCancel}>Cancel</button>
+      </div>
+    </div>
+  );
+}
+
+// ─── MAIN ADMIN APP ───────────────────────────────────────────
+function AdminApp({ onLogout }) {
+  const [page, setPage] = useState("dashboard");
+  const [products, setProducts] = useState([]);
+  const [snapshots, setSnapshots] = useState([]); // [{date, key}]
+  const [loading, setLoading] = useState(true);
+  const [toast, setToast] = useState("");
+  const [modal, setModal] = useState(null); // {type, data}
+  const [newPw, setNewPw] = useState(""); const [newPw2, setNewPw2] = useState("");
+  const [pwMsg, setPwMsg] = useState(null);
+  const [genPreview, setGenPreview] = useState(null);
+  const [snapshotFilter, setSnapshotFilter] = useState("");
+
+  function showToast(msg) { setToast(msg); setTimeout(() => setToast(""), 3000); }
+
+  // Load current products and snapshot list
+  useEffect(() => { load(); }, []);
+
+  async function load() {
+    setLoading(true);
+    const prods = await storageGet("dz:current_products");
+    setProducts(prods || SAMPLE);
+    if (!prods) await storageSet("dz:current_products", SAMPLE);
+
+    const keys = await storageList("dz:snap:");
+    const snaps = keys.map(k => ({ key: k, date: k.replace("dz:snap:", "") })).sort((a, b) => b.date.localeCompare(a.date));
+    setSnapshots(snaps);
+    setLoading(false);
+  }
+
+  // ── PRODUCT OPS ─────────────────────────────────────────────
+  async function saveProducts(updated) {
+    setProducts(updated);
+    await storageSet("dz:current_products", updated);
+  }
+
+  async function addProduct(p) {
+    const updated = [p, ...products];
+    await saveProducts(updated);
+    setModal(null);
+    showToast("✅ Product added!");
+  }
+
+  async function editProduct(p) {
+    const updated = products.map(x => x.id === p.id ? p : x);
+    await saveProducts(updated);
+    setModal(null);
+    showToast("✅ Product updated!");
+  }
+
+  async function deleteProduct(id) {
+    if (!confirm("Delete this product?")) return;
+    const updated = products.filter(p => p.id !== id);
+    await saveProducts(updated);
+    showToast("🗑️ Product deleted.");
+  }
+
+  // ── SNAPSHOTS ────────────────────────────────────────────────
+  async function saveSnapshot() {
+    const date = todayStr();
+    const key = `dz:snap:${date}`;
+    const snap = { date, products: [...products], createdAt: new Date().toISOString() };
+    await storageSet(key, snap);
+    showToast(`📸 Snapshot saved for ${fmtDate(date)}`);
+    await load();
+  }
+
+  async function deleteSnapshot(key) {
+    if (!confirm("Delete this snapshot?")) return;
+    await storageDelete(key);
+    showToast("🗑️ Snapshot deleted.");
+    await load();
+  }
+
+  async function generatePage(snap) {
+    const html = generateHTML(snap);
+    setGenPreview({ html, date: snap.date, snap });
+  }
+
+  async function generateFromKey(key) {
+    const snap = await storageGet(key);
+    if (snap) generatePage(snap);
+  }
+
+  function downloadHTML(html, date) {
+    const blob = new Blob([html], { type: "text/html" });
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = `deliveryzone-${date}.html`;
+    a.click();
+  }
+
+  // ── CHANGE PASSWORD ──────────────────────────────────────────
+  async function changePassword() {
+    if (!newPw || newPw.length < 8) { setPwMsg({ type: "error", msg: "Password must be at least 8 characters." }); return; }
+    if (newPw !== newPw2) { setPwMsg({ type: "error", msg: "Passwords do not match." }); return; }
+    const hash = await hashPassword(newPw);
+    await storageSet(ADMIN_PASSWORD_HASH_KEY, hash);
+    setPwMsg({ type: "success", msg: "✅ Password updated!" });
+    setNewPw(""); setNewPw2("");
+  }
+
+  // ── NAV ──────────────────────────────────────────────────────
+  const nav = [
+    { id: "dashboard", icon: "◈", label: "Dashboard" },
+    { id: "products", icon: "⊞", label: "Products" },
+    { id: "snapshots", icon: "📅", label: "Snapshots" },
+    { id: "generate", icon: "⚡", label: "Generate Page" },
+    { id: "settings", icon: "⚙", label: "Settings" },
+  ];
+
+  const stats = [
+    { label: "Total Products", val: products.length, icon: "⊞" },
+    { label: "Categories", val: [...new Set(products.map(p => p.category))].length, icon: "🏷" },
+    { label: "Snapshots", val: snapshots.length, icon: "📅" },
+    { label: "Featured", val: products.filter(p => p.featured).length, icon: "⭐" },
+  ];
+
+  if (loading) return <div style={{ ...S.app, display: "flex", alignItems: "center", justifyContent: "center", minHeight: "100vh" }}><div style={{ color: "#F59E0B", fontFamily: "'Syne', sans-serif", fontSize: "1.2rem" }}>Loading DeliveryZone…</div></div>;
+
+  return (
+    <div style={S.app}>
+      {/* TOAST */}
+      {toast && <div style={{ position: "fixed", top: "1.5rem", right: "1.5rem", background: "#1A2F44", border: "1px solid rgba(245,158,11,0.3)", color: "#F0F6FF", padding: "0.8rem 1.3rem", borderRadius: 12, zIndex: 600, fontSize: "0.9rem", boxShadow: "0 4px 20px rgba(0,0,0,0.4)", animation: "none" }}>{toast}</div>}
+
+      {/* MODAL */}
+      {modal && (
+        <div style={S.overlay} onClick={e => e.target === e.currentTarget && setModal(null)}>
+          <div style={S.modal}>
+            <div style={S.modalHeader}>
+              <span style={{ fontFamily: "'Syne', sans-serif", fontWeight: 700, fontSize: "1.1rem" }}>{modal.type === "add" ? "Add Product" : "Edit Product"}</span>
+              <button onClick={() => setModal(null)} style={{ background: "none", border: "none", color: "#8BA4BC", cursor: "pointer", fontSize: "1.1rem" }}>✕</button>
+            </div>
+            <div style={S.modalBody}>
+              <ProductForm initial={modal.data} onSave={modal.type === "add" ? addProduct : editProduct} onCancel={() => setModal(null)} />
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* PREVIEW MODAL */}
+      {genPreview && (
+        <div style={S.overlay}>
+          <div style={{ ...S.modal, maxWidth: 780, display: "flex", flexDirection: "column" }}>
+            <div style={S.modalHeader}>
+              <span style={{ fontFamily: "'Syne', sans-serif", fontWeight: 700, fontSize: "1.1rem" }}>🖥 Preview — {fmtDate(genPreview.date)}</span>
+              <div style={{ display: "flex", gap: "0.6rem", alignItems: "center" }}>
+                <button style={S.btnSm} onClick={() => downloadHTML(genPreview.html, genPreview.date)}>⬇ Download HTML</button>
+                <button onClick={() => setGenPreview(null)} style={{ background: "none", border: "none", color: "#8BA4BC", cursor: "pointer", fontSize: "1.1rem" }}>✕</button>
+              </div>
+            </div>
+            <div style={{ padding: "1rem 1.5rem 0.5rem", color: "#8BA4BC", fontSize: "0.82rem" }}>Live preview below — download the HTML file to deploy.</div>
+            <iframe
+              srcDoc={genPreview.html}
+              style={{ flex: 1, height: 500, border: "none", borderRadius: "0 0 18px 18px" }}
+              title="Preview"
+            />
+          </div>
+        </div>
+      )}
+
+      <div style={S.shell}>
+        {/* SIDEBAR */}
+        <aside style={S.sidebar}>
+          <div style={S.sidebarLogo}>Delivery<span style={{ color: "#F59E0B" }}>Zone</span></div>
+          {nav.map(n => (
+            <button key={n.id} style={{ ...S.navItem, ...(page === n.id ? S.navItemActive : {}) }} onClick={() => setPage(n.id)}>
+              <span>{n.icon}</span>{n.label}
+            </button>
+          ))}
+          <div style={{ flex: 1 }} />
+          <button style={{ ...S.navItem, color: "#ef4444" }} onClick={() => { clearSession(); onLogout(); }}>
+            <span>⎋</span> Sign Out
+          </button>
+        </aside>
+
+        {/* MAIN */}
+        <main style={S.main}>
+
+          {/* ── DASHBOARD ── */}
+          {page === "dashboard" && (
+            <div>
+              <div style={S.pageTitle}>Dashboard</div>
+              <div style={S.pageSub}>Welcome back — here's your DeliveryZone overview.</div>
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))", gap: "1rem", marginBottom: "2rem" }}>
+                {stats.map(s => (
+                  <div key={s.label} style={{ ...S.card, marginBottom: 0 }}>
+                    <div style={{ fontSize: "1.8rem", marginBottom: "0.5rem" }}>{s.icon}</div>
+                    <div style={{ fontFamily: "'Syne', sans-serif", fontWeight: 800, fontSize: "2rem", color: "#F59E0B" }}>{s.val}</div>
+                    <div style={{ color: "#8BA4BC", fontSize: "0.85rem" }}>{s.label}</div>
+                  </div>
+                ))}
+              </div>
+              <div style={S.card}>
+                <div style={{ fontFamily: "'Syne', sans-serif", fontWeight: 700, marginBottom: "0.8rem" }}>Quick Actions</div>
+                <div style={{ display: "flex", gap: "0.8rem", flexWrap: "wrap" }}>
+                  <button style={S.btnSm} onClick={() => setModal({ type: "add" })}>+ Add Product</button>
+                  <button style={S.btnSm} onClick={saveSnapshot}>📸 Save Today's Snapshot</button>
+                  <button style={{ ...S.btnOutline }} onClick={() => setPage("generate")}>⚡ Generate Page</button>
+                </div>
+              </div>
+              <div style={S.card}>
+                <div style={{ fontFamily: "'Syne', sans-serif", fontWeight: 700, marginBottom: "1rem" }}>Recent Snapshots</div>
+                {snapshots.length === 0 ? <div style={{ color: "#4A6580" }}>No snapshots yet. Save one above!</div> : snapshots.slice(0, 5).map(s => (
+                  <div key={s.key} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "0.7rem 0", borderBottom: "1px solid rgba(255,255,255,0.04)" }}>
+                    <span style={{ fontSize: "0.9rem" }}>📅 {fmtDate(s.date)}</span>
+                    <button style={S.btnSm} onClick={() => generateFromKey(s.key)}>⚡ Generate</button>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* ── PRODUCTS ── */}
+          {page === "products" && (
+            <div>
+              <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", flexWrap: "wrap", gap: "1rem", marginBottom: "0.5rem" }}>
+                <div>
+                  <div style={S.pageTitle}>Products</div>
+                  <div style={S.pageSub}>Manage your affiliate product catalog.</div>
+                </div>
+                <button style={S.btnSm} onClick={() => setModal({ type: "add" })}>+ Add Product</button>
+              </div>
+              <div style={S.card}>
+                <div style={S.tableWrap}>
+                  <table style={S.table}>
+                    <thead>
+                      <tr>
+                        {["Product", "Category", "Price", "Rating", "Featured", ""].map(h => <th key={h} style={S.th}>{h}</th>)}
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {products.map(p => (
+                        <tr key={p.id}>
+                          <td style={S.td}>
+                            <div style={{ display: "flex", alignItems: "center", gap: "0.8rem" }}>
+                              {p.image ? <img src={p.image} alt="" style={{ width: 44, height: 44, borderRadius: 8, objectFit: "cover", flexShrink: 0 }} /> : <div style={{ width: 44, height: 44, borderRadius: 8, background: "#112236", display: "flex", alignItems: "center", justifyContent: "center" }}>📦</div>}
+                              <span style={{ fontWeight: 500, fontSize: "0.88rem" }}>{p.name}</span>
+                            </div>
+                          </td>
+                          <td style={S.td}><span style={S.badge}>{p.category}</span></td>
+                          <td style={S.td}><span style={{ color: "#F59E0B", fontWeight: 700 }}>{p.price}</span>{p.originalPrice && <span style={{ color: "#4A6580", textDecoration: "line-through", fontSize: "0.8rem", marginLeft: "0.4rem" }}>{p.originalPrice}</span>}</td>
+                          <td style={S.td}>{"★".repeat(Math.round(p.rating))} {p.rating.toFixed(1)}</td>
+                          <td style={S.td}>{p.featured ? <span style={S.badgeGreen}>⭐ Yes</span> : <span style={S.badgeGray}>No</span>}</td>
+                          <td style={S.td}>
+                            <div style={{ display: "flex", gap: "0.5rem" }}>
+                              <button style={S.btnSm} onClick={() => setModal({ type: "edit", data: p })}>Edit</button>
+                              <button style={S.btnDanger} onClick={() => deleteProduct(p.id)}>Delete</button>
+                            </div>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* ── SNAPSHOTS ── */}
+          {page === "snapshots" && (
+            <div>
+              <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", flexWrap: "wrap", gap: "1rem", marginBottom: "0.5rem" }}>
+                <div>
+                  <div style={S.pageTitle}>Snapshots</div>
+                  <div style={S.pageSub}>Date-stamped product history. Each snapshot preserves the catalog for that day.</div>
+                </div>
+                <button style={S.btnSm} onClick={saveSnapshot}>📸 Save Today</button>
+              </div>
+              <div style={{ marginBottom: "1rem" }}>
+                <input style={{ ...S.input, maxWidth: 300 }} placeholder="Filter by date (e.g. 2025)…" value={snapshotFilter} onChange={e => setSnapshotFilter(e.target.value)} />
+              </div>
+              {snapshots.length === 0 ? (
+                <div style={S.card}><div style={{ color: "#4A6580", textAlign: "center", padding: "2rem" }}>No snapshots yet. Click "Save Today" to capture the current catalog.</div></div>
+              ) : snapshots.filter(s => !snapshotFilter || s.date.includes(snapshotFilter)).map(s => (
+                <div key={s.key} style={{ ...S.card, display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: "1rem", marginBottom: "0.8rem" }}>
+                  <div>
+                    <div style={{ fontFamily: "'Syne', sans-serif", fontWeight: 700 }}>📅 {fmtDate(s.date)}</div>
+                    <div style={{ color: "#8BA4BC", fontSize: "0.82rem", marginTop: "0.2rem" }}>Key: <code style={{ color: "#F59E0B" }}>{s.key}</code></div>
+                  </div>
+                  <div style={{ display: "flex", gap: "0.6rem" }}>
+                    <button style={S.btnSm} onClick={() => generateFromKey(s.key)}>⚡ Generate & Preview</button>
+                    <button style={S.btnDanger} onClick={() => deleteSnapshot(s.key)}>Delete</button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {/* ── GENERATE ── */}
+          {page === "generate" && (
+            <div>
+              <div style={S.pageTitle}>Generate Page</div>
+              <div style={S.pageSub}>Generate a standalone HTML page from any snapshot or from the live catalog.</div>
+              <div style={S.card}>
+                <div style={{ fontFamily: "'Syne', sans-serif", fontWeight: 700, marginBottom: "1rem" }}>⚡ Generate from Live Catalog</div>
+                <div style={{ color: "#8BA4BC", fontSize: "0.88rem", marginBottom: "1.2rem" }}>Creates a page from your current {products.length} products (today: {fmtDate(todayStr())}).</div>
+                <button style={S.btnSm} onClick={() => generatePage({ date: todayStr(), products })}>Generate Live Page</button>
+              </div>
+              <div style={S.card}>
+                <div style={{ fontFamily: "'Syne', sans-serif", fontWeight: 700, marginBottom: "1rem" }}>📅 Generate from Snapshot</div>
+                {snapshots.length === 0 ? <div style={{ color: "#4A6580" }}>No snapshots yet.</div> : snapshots.map(s => (
+                  <div key={s.key} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "0.7rem 0", borderBottom: "1px solid rgba(255,255,255,0.04)" }}>
+                    <span style={{ fontSize: "0.9rem" }}>📅 {fmtDate(s.date)}</span>
+                    <button style={S.btnSm} onClick={() => generateFromKey(s.key)}>⚡ Generate</button>
+                  </div>
+                ))}
+              </div>
+              <div style={S.card}>
+                <div style={{ fontFamily: "'Syne', sans-serif", fontWeight: 700, marginBottom: "0.8rem" }}>📌 How it works</div>
+                <div style={{ color: "#8BA4BC", fontSize: "0.88rem", lineHeight: 1.8 }}>
+                  1. Add products to your catalog<br/>
+                  2. Save a snapshot for today's date<br/>
+                  3. Generate → Preview → Download the HTML file<br/>
+                  4. Upload the HTML to GitHub Pages or any static host
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* ── SETTINGS ── */}
+          {page === "settings" && (
+            <div>
+              <div style={S.pageTitle}>Settings</div>
+              <div style={S.pageSub}>Security and account configuration.</div>
+
+              <div style={S.card}>
+                <div style={{ fontFamily: "'Syne', sans-serif", fontWeight: 700, marginBottom: "1rem" }}>🔐 Change Admin Password</div>
+                {pwMsg && <div style={pwMsg.type === "error" ? S.error : S.success}>{pwMsg.msg}</div>}
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem", marginBottom: "1rem" }}>
+                  <div style={S.formField}>
+                    <label style={S.label}>New Password</label>
+                    <input type="password" style={S.input} value={newPw} onChange={e => setNewPw(e.target.value)} placeholder="Min. 8 characters" />
+                  </div>
+                  <div style={S.formField}>
+                    <label style={S.label}>Confirm Password</label>
+                    <input type="password" style={S.input} value={newPw2} onChange={e => setNewPw2(e.target.value)} placeholder="Repeat password" />
+                  </div>
+                </div>
+                <button style={S.btnSm} onClick={changePassword}>Update Password</button>
+              </div>
+
+              <div style={S.card}>
+                <div style={{ fontFamily: "'Syne', sans-serif", fontWeight: 700, marginBottom: "1rem" }}>🛡 Security Info</div>
+                <div style={{ color: "#8BA4BC", fontSize: "0.88rem", lineHeight: 1.9 }}>
+                  • Passwords are hashed with <strong style={{ color: "#F0F6FF" }}>SHA-256</strong> before storage<br/>
+                  • Sessions expire after <strong style={{ color: "#F0F6FF" }}>30 minutes</strong> of inactivity<br/>
+                  • Login locked after <strong style={{ color: "#F0F6FF" }}>5 failed attempts</strong> (5 min cooldown)<br/>
+                  • All data is stored in your personal encrypted storage<br/>
+                  • No data is shared with other users
+                </div>
+              </div>
+
+              <div style={S.card}>
+                <div style={{ fontFamily: "'Syne', sans-serif", fontWeight: 700, marginBottom: "1rem" }}>💾 Data Management</div>
+                <div style={{ display: "flex", gap: "0.8rem", flexWrap: "wrap" }}>
+                  <button style={S.btnSm} onClick={async () => {
+                    const data = { products, snapshots: [] };
+                    for (const s of snapshots) { const d = await storageGet(s.key); data.snapshots.push({ ...s, data: d }); }
+                    const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
+                    const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = "deliveryzone-export.json"; a.click();
+                    showToast("✅ Data exported!");
+                  }}>⬇ Export All Data</button>
+                  <button style={S.btnDanger} onClick={async () => {
+                    if (!confirm("Delete ALL snapshots? This cannot be undone.")) return;
+                    for (const s of snapshots) await storageDelete(s.key);
+                    showToast("🗑️ All snapshots deleted."); await load();
+                  }}>🗑 Delete All Snapshots</button>
+                </div>
+              </div>
+            </div>
+          )}
+
+        </main>
+      </div>
+    </div>
+  );
+}
+
+// ─── ROOT ─────────────────────────────────────────────────────
+export default function App() {
+  const [authed, setAuthed] = useState(!!getSession());
+
+  // Refresh session on activity
+  useEffect(() => {
+    if (!authed) return;
+    const refresh = () => setSession();
+    window.addEventListener("click", refresh);
+    window.addEventListener("keydown", refresh);
+    return () => { window.removeEventListener("click", refresh); window.removeEventListener("keydown", refresh); };
+  }, [authed]);
+
+  if (!authed) return <LoginPage onLogin={() => setAuthed(true)} />;
+  return <AdminApp onLogout={() => setAuthed(false)} />;
+}
