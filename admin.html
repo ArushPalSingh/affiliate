@@ -3,6 +3,8 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<meta http-equiv="X-Content-Type-Options" content="nosniff"/>
+<meta http-equiv="X-Frame-Options" content="DENY"/>
 <title>DeliveryZone Admin</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
@@ -16,19 +18,18 @@
   --border:rgba(245,158,11,0.13);
   --red:rgba(239,68,68,0.85);--red-bg:rgba(239,68,68,0.1);--red-border:rgba(239,68,68,0.3);
   --green-bg:rgba(34,197,94,0.1);--green-border:rgba(34,197,94,0.3);--green:#86efac;
+  --pink:#e879f9;--pink-bg:rgba(232,121,249,0.1);--pink-border:rgba(232,121,249,0.3);
   --radius:14px;--radius-sm:8px;
 }
 html{scroll-behavior:smooth}
 body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
 ::-webkit-scrollbar{width:5px}::-webkit-scrollbar-track{background:var(--bg)}::-webkit-scrollbar-thumb{background:var(--accent-d);border-radius:4px}
 
-/* ── UTILS ── */
 .hidden{display:none!important}
 .flex{display:flex}.flex-col{flex-direction:column}.items-center{align-items:center}.justify-between{justify-content:space-between}
-.gap-sm{gap:.5rem}.gap{gap:.8rem}.gap-lg{gap:1.2rem}
-.wrap{flex-wrap:wrap}
+.gap-sm{gap:.5rem}.gap{gap:.8rem}.gap-lg{gap:1.2rem}.wrap{flex-wrap:wrap}
 
-/* ── LOGIN ── */
+/* LOGIN */
 #loginScreen{min-height:100vh;display:flex;align-items:center;justify-content:center;background:radial-gradient(ellipse at 60% 20%,rgba(245,158,11,.08) 0%,transparent 60%),var(--bg);padding:1rem}
 .login-card{background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:2.5rem;width:100%;max-width:400px;box-shadow:0 0 60px rgba(0,0,0,.5);animation:fadeUp .5s ease}
 .brand{font-family:'Syne',sans-serif;font-weight:800;font-size:1.9rem;color:var(--text)}
@@ -37,12 +38,13 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 .security-box{margin-top:1.5rem;padding:1rem;background:rgba(245,158,11,.05);border-radius:10px;border:1px solid var(--border);font-size:.78rem;color:var(--muted);line-height:1.8}
 .security-box strong{color:var(--accent)}
 
-/* ── SHELL ── */
+/* SHELL */
 #adminShell{display:none;min-height:100vh}
 #adminShell.visible{display:flex}
-.sidebar{width:230px;background:var(--bg2);border-right:1px solid var(--border);display:flex;flex-direction:column;padding:1.5rem 1rem;flex-shrink:0;position:sticky;top:0;height:100vh;overflow-y:auto}
+.sidebar{width:235px;background:var(--bg2);border-right:1px solid var(--border);display:flex;flex-direction:column;padding:1.5rem 1rem;flex-shrink:0;position:sticky;top:0;height:100vh;overflow-y:auto}
 .sidebar-logo{font-family:'Syne',sans-serif;font-weight:800;font-size:1.3rem;margin-bottom:2rem;padding-left:.5rem;color:var(--text)}
 .sidebar-logo span{color:var(--accent)}
+.nav-section{font-size:.62rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--dim);padding:.3rem .8rem;margin:.5rem 0 .2rem}
 .nav-btn{display:flex;align-items:center;gap:.7rem;padding:.65rem .8rem;border-radius:10px;cursor:pointer;font-size:.88rem;font-weight:500;color:var(--muted);margin-bottom:.2rem;border:none;background:transparent;width:100%;text-align:left;transition:all .15s;font-family:inherit}
 .nav-btn:hover{color:var(--text);background:rgba(255,255,255,.04)}
 .nav-btn.active{background:var(--accent-l);color:var(--accent)}
@@ -50,22 +52,22 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 .sidebar-spacer{flex:1}
 main{flex:1;padding:2rem;overflow-y:auto;min-width:0}
 
-/* ── PAGE SECTIONS ── */
+/* PAGE SECTIONS */
 .page{display:none;animation:fadeUp .3s ease}
 .page.active{display:block}
 .page-title{font-family:'Syne',sans-serif;font-weight:800;font-size:1.7rem;margin-bottom:.3rem}
 .page-sub{color:var(--muted);font-size:.88rem;margin-bottom:2rem}
 
-/* ── CARDS ── */
+/* CARDS */
 .card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:1.5rem;margin-bottom:1.2rem}
-.card-title{font-family:'Syne',sans-serif;font-weight:700;margin-bottom:1rem}
-.stat-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:1rem;margin-bottom:1.5rem}
+.card-title{font-family:'Syne',sans-serif;font-weight:700;margin-bottom:1rem;display:flex;align-items:center;gap:.5rem}
+.stat-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(155px,1fr));gap:1rem;margin-bottom:1.5rem}
 .stat-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:1.3rem}
 .stat-icon{font-size:1.6rem;margin-bottom:.5rem}
 .stat-val{font-family:'Syne',sans-serif;font-weight:800;font-size:2rem;color:var(--accent)}
 .stat-label{color:var(--muted);font-size:.83rem}
 
-/* ── INPUTS ── */
+/* INPUTS */
 label.field{display:flex;flex-direction:column;gap:.4rem;font-size:.75rem;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:var(--muted)}
 input[type=text],input[type=url],input[type=password],input[type=number],input[type=email],select,textarea{
   background:var(--bg2);border:1px solid var(--border);color:var(--text);
@@ -77,8 +79,12 @@ select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='ht
 .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
 .form-grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:1rem}
 @media(max-width:640px){.form-grid,.form-grid-3{grid-template-columns:1fr}}
+.field-full{grid-column:1/-1}
+.char-count{font-size:.72rem;color:var(--dim);text-align:right;margin-top:.2rem}
+.char-count.warn{color:var(--accent)}
+.char-count.over{color:#f87171}
 
-/* ── BUTTONS ── */
+/* BUTTONS */
 .btn{background:var(--accent);color:#000;font-family:'Syne',sans-serif;font-weight:700;font-size:.88rem;padding:.65rem 1.4rem;border-radius:999px;border:none;cursor:pointer;transition:background .2s,transform .15s;white-space:nowrap}
 .btn:hover{background:var(--accent-d);transform:translateY(-1px)}
 .btn-full{width:100%;padding:.82rem}
@@ -89,14 +95,19 @@ select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='ht
 .btn-ghost:hover{border-color:var(--accent);color:var(--accent)}
 .btn-danger{background:transparent;color:#f87171;border:1px solid var(--red-border);font-family:inherit;font-size:.8rem;padding:.42rem .9rem;border-radius:var(--radius-sm);cursor:pointer;transition:all .2s}
 .btn-danger:hover{background:var(--red-bg)}
+.btn-pink{background:var(--pink-bg);color:var(--pink);border:1px solid var(--pink-border);font-family:'Syne',sans-serif;font-weight:700;font-size:.78rem;padding:.45rem 1rem;border-radius:999px;cursor:pointer;transition:all .2s;white-space:nowrap}
+.btn-pink:hover{background:rgba(232,121,249,0.18)}
+.btn-copy{background:var(--bg3);color:var(--muted);border:1px solid var(--border);font-family:inherit;font-size:.72rem;padding:.3rem .7rem;border-radius:6px;cursor:pointer;transition:all .2s}
+.btn-copy:hover{color:var(--text);border-color:var(--accent)}
 
-/* ── ALERTS ── */
+/* ALERTS */
 .alert{padding:.65rem 1rem;border-radius:var(--radius-sm);font-size:.85rem;margin-bottom:1rem}
 .alert-error{background:var(--red-bg);border:1px solid var(--red-border);color:#fca5a5}
 .alert-success{background:var(--green-bg);border:1px solid var(--green-border);color:var(--green)}
 .alert-info{background:var(--accent-l);border:1px solid rgba(245,158,11,.25);color:var(--accent)}
+.alert-pink{background:var(--pink-bg);border:1px solid var(--pink-border);color:var(--pink)}
 
-/* ── TABLE ── */
+/* TABLE */
 .table-wrap{overflow-x:auto}
 table{width:100%;border-collapse:collapse;font-size:.87rem}
 th{text-align:left;padding:.65rem 1rem;border-bottom:1px solid var(--border);color:var(--muted);font-size:.72rem;font-weight:600;letter-spacing:.07em;text-transform:uppercase}
@@ -106,64 +117,95 @@ tr:hover td{background:rgba(255,255,255,.02)}
 .thumb{width:42px;height:42px;border-radius:8px;object-fit:cover;flex-shrink:0;background:var(--bg3)}
 .thumb-ph{width:42px;height:42px;border-radius:8px;background:var(--bg3);display:flex;align-items:center;justify-content:center;font-size:1.2rem;flex-shrink:0}
 
-/* ── BADGES ── */
+/* BADGES */
 .badge{display:inline-block;font-size:.7rem;font-weight:700;padding:.18rem .55rem;border-radius:6px;letter-spacing:.05em;text-transform:uppercase}
 .badge-amber{background:var(--accent-l);color:var(--accent)}
 .badge-green{background:var(--green-bg);color:var(--green)}
 .badge-gray{background:rgba(255,255,255,.06);color:var(--muted)}
 .badge-red{background:var(--red-bg);color:#f87171}
+.badge-pink{background:var(--pink-bg);color:var(--pink)}
 
-/* ── MODAL ── */
+/* MODAL */
 .overlay{position:fixed;inset:0;background:rgba(5,12,22,.88);backdrop-filter:blur(7px);z-index:500;display:none;align-items:center;justify-content:center;padding:1rem}
 .overlay.open{display:flex}
-.modal{background:var(--surface);border:1px solid var(--border);border-radius:18px;width:100%;max-width:560px;max-height:92vh;overflow-y:auto;animation:slideUp .28s ease}
-.modal-lg{max-width:900px}
-.modal-header{display:flex;align-items:center;justify-content:space-between;padding:1.3rem 1.5rem;border-bottom:1px solid var(--border)}
+.modal{background:var(--surface);border:1px solid var(--border);border-radius:18px;width:100%;max-width:620px;max-height:92vh;overflow-y:auto;animation:slideUp .28s ease}
+.modal-lg{max-width:960px}
+.modal-header{display:flex;align-items:center;justify-content:space-between;padding:1.3rem 1.5rem;border-bottom:1px solid var(--border);position:sticky;top:0;background:var(--surface);z-index:1;border-radius:18px 18px 0 0}
 .modal-header h3{font-family:'Syne',sans-serif;font-weight:700;font-size:1.1rem}
 .modal-body{padding:1.5rem}
 .modal-close{background:none;border:none;color:var(--muted);font-size:1.2rem;cursor:pointer;padding:.2rem .5rem;transition:color .2s}
 .modal-close:hover{color:var(--text)}
 
-/* ── PREVIEW IFRAME ── */
-#previewFrame{width:100%;height:520px;border:none;border-radius:0 0 18px 18px}
+/* PREVIEW IFRAME */
+#previewFrame{width:100%;height:560px;border:none;border-radius:0 0 18px 18px}
 
-/* ── TOAST ── */
-#toast{position:fixed;top:1.5rem;right:1.5rem;background:var(--surface);border:1px solid rgba(245,158,11,.3);color:var(--text);padding:.8rem 1.3rem;border-radius:12px;z-index:700;font-size:.88rem;box-shadow:0 4px 24px rgba(0,0,0,.4);transform:translateY(-10px);opacity:0;transition:all .3s;pointer-events:none}
+/* TOAST */
+#toast{position:fixed;top:1.5rem;right:1.5rem;background:var(--surface);border:1px solid rgba(245,158,11,.3);color:var(--text);padding:.8rem 1.3rem;border-radius:12px;z-index:700;font-size:.88rem;box-shadow:0 4px 24px rgba(0,0,0,.4);transform:translateY(-10px);opacity:0;transition:all .3s;pointer-events:none;max-width:320px}
 #toast.show{transform:translateY(0);opacity:1}
 
-/* ── SNAPSHOT ITEMS ── */
+/* SNAPSHOT ITEMS */
 .snap-item{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:.8rem;padding:.9rem 0;border-bottom:1px solid rgba(255,255,255,.04)}
 .snap-item:last-child{border-bottom:none}
 .snap-date{font-family:'Syne',sans-serif;font-weight:700}
 .snap-meta{color:var(--muted);font-size:.8rem;margin-top:.1rem}
 
-/* ── CODE BOX ── */
-.code-box{background:#060f19;border:1px solid var(--border);border-radius:10px;padding:1rem 1.2rem;font-size:.78rem;font-family:monospace;color:#93c5fd;overflow-x:auto;white-space:pre-wrap;word-break:break-all;line-height:1.6}
+/* CODE BOX */
+.code-box{background:#060f19;border:1px solid var(--border);border-radius:10px;padding:1rem 1.2rem;font-size:.78rem;font-family:monospace;color:#93c5fd;overflow-x:auto;white-space:pre-wrap;word-break:break-all;line-height:1.6;position:relative}
 
-/* ── SEARCH BAR ── */
+/* SEARCH BAR */
 .search-bar{position:relative;max-width:340px;margin-bottom:1rem}
 .search-bar input{padding:.6rem 1rem .6rem 2.4rem}
 .search-bar svg{position:absolute;left:.75rem;top:50%;transform:translateY(-50%);color:var(--muted);pointer-events:none}
 
-/* ── EMPTY ── */
+/* EMPTY */
 .empty{text-align:center;padding:3rem 1rem;color:var(--muted)}
 .empty-icon{font-size:2.5rem;margin-bottom:.8rem}
 
-/* ── ANIMATIONS ── */
+/* PIN BUILDER */
+.pin-card{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:1.2rem;margin-bottom:1rem}
+.pin-card-header{display:flex;align-items:center;justify-content:space-between;gap:.8rem;margin-bottom:.8rem;flex-wrap:wrap}
+.pin-card-title{font-family:'Syne',sans-serif;font-weight:700;font-size:.92rem}
+.pin-field{margin-bottom:.7rem}
+.pin-field label{font-size:.7rem;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:.3rem}
+.pin-essentials{background:#060f19;border:1px solid var(--border);border-radius:8px;padding:.9rem;font-size:.78rem;font-family:monospace;color:#c4b5fd;white-space:pre-wrap;word-break:break-all;line-height:1.7;position:relative}
+.pin-essentials-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:.4rem}
+.pin-essentials-label{font-size:.7rem;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:var(--pink)}
+.tabs{display:flex;gap:.4rem;margin-bottom:1.5rem;border-bottom:1px solid var(--border);padding-bottom:.8rem;flex-wrap:wrap}
+.tab{background:none;border:none;color:var(--muted);font-family:inherit;font-size:.85rem;font-weight:500;padding:.4rem .9rem;border-radius:8px;cursor:pointer;transition:all .15s}
+.tab:hover{color:var(--text);background:rgba(255,255,255,.04)}
+.tab.active{background:var(--accent-l);color:var(--accent);font-weight:700}
+.tab-panel{display:none}
+.tab-panel.active{display:block}
+
+/* PRODUCT SEARCH RESULTS */
+.search-results-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:1rem;margin-top:1rem}
+.result-card{background:var(--bg2);border:1px solid var(--border);border-radius:10px;overflow:hidden;transition:border-color .2s;cursor:pointer}
+.result-card:hover{border-color:var(--accent)}
+.result-card.selected{border-color:var(--accent);background:var(--accent-l)}
+.result-img{width:100%;height:130px;object-fit:cover;background:var(--bg3)}
+.result-body{padding:.8rem}
+.result-name{font-weight:600;font-size:.85rem;line-height:1.3;margin-bottom:.3rem}
+.result-price{color:var(--accent);font-family:'Syne',sans-serif;font-weight:700;font-size:.9rem}
+.result-orig{color:var(--dim);text-decoration:line-through;font-size:.75rem;margin-left:.3rem}
+.result-disc{background:var(--accent);color:#000;font-size:.65rem;font-weight:800;padding:.1rem .4rem;border-radius:4px;margin-left:.4rem}
+.result-cat{font-size:.68rem;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:.3rem}
+.result-check{display:none}
+.result-card.selected .result-check{display:inline;color:var(--accent);font-size:1.1rem;float:right}
+
+/* LOADING SPINNER */
+.spinner{display:inline-block;width:18px;height:18px;border:2px solid rgba(245,158,11,.3);border-top-color:var(--accent);border-radius:50%;animation:spin .6s linear infinite;vertical-align:middle;margin-right:.5rem}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* ANIMATIONS */
 @keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
 @keyframes slideUp{from{opacity:0;transform:translateY(28px)}to{opacity:1;transform:translateY(0)}}
 
-/* ── RESPONSIVE ── */
-@media(max-width:768px){
-  .sidebar{width:200px}
-  main{padding:1.2rem}
-  .page-title{font-size:1.4rem}
-}
+/* RESPONSIVE */
+@media(max-width:768px){.sidebar{width:200px}main{padding:1.2rem}.page-title{font-size:1.4rem}}
 @media(max-width:600px){
   #adminShell{flex-direction:column}
   .sidebar{width:100%;height:auto;flex-direction:row;flex-wrap:wrap;padding:.8rem;position:relative;gap:.3rem}
-  .sidebar-logo{display:none}
-  .sidebar-spacer{display:none}
+  .sidebar-logo{display:none}.sidebar-spacer{display:none}.nav-section{display:none}
   .nav-btn{width:auto;font-size:.78rem;padding:.45rem .7rem}
   main{padding:1rem}
 }
@@ -171,9 +213,7 @@ tr:hover td{background:rgba(255,255,255,.02)}
 </head>
 <body>
 
-<!-- ═══════════════════════════════════════════════
-     LOGIN SCREEN
-════════════════════════════════════════════════ -->
+<!-- LOGIN -->
 <div id="loginScreen">
   <div class="login-card">
     <div class="brand">Delivery<span>Zone</span></div>
@@ -181,9 +221,9 @@ tr:hover td{background:rgba(255,255,255,.02)}
     <div id="loginError" class="alert alert-error hidden"></div>
     <label class="field" style="margin-bottom:1rem">
       Password
-      <input type="password" id="loginPw" placeholder="Enter admin password" autocomplete="current-password"/>
+      <input type="password" id="loginPw" placeholder="Enter admin password" autocomplete="current-password" maxlength="128"/>
     </label>
-    <button class="btn btn-full" onclick="doLogin()">Sign In →</button>
+    <button class="btn btn-full" id="loginBtn">Sign In →</button>
     <div style="display:flex;align-items:center;gap:.5rem;margin:.8rem 0;color:var(--dim);font-size:.8rem">
       <label style="display:flex;align-items:center;gap:.4rem;cursor:pointer;text-transform:none;letter-spacing:0">
         <input type="checkbox" id="showPw" onchange="document.getElementById('loginPw').type=this.checked?'text':'password'"> Show password
@@ -192,29 +232,31 @@ tr:hover td{background:rgba(255,255,255,.02)}
     <div class="security-box">
       <strong>🔐 Default password:</strong> <code style="color:var(--text)">DeliveryZone2025!</code><br>
       Change it in Settings after first login.<br>
-      Locked after 5 failed attempts.
+      Locked for 5 min after 5 failed attempts.
     </div>
   </div>
 </div>
 
-<!-- ═══════════════════════════════════════════════
-     ADMIN SHELL
-════════════════════════════════════════════════ -->
+<!-- ADMIN SHELL -->
 <div id="adminShell">
-
-  <!-- SIDEBAR -->
   <aside class="sidebar">
     <div class="sidebar-logo">Delivery<span>Zone</span></div>
+    <div class="nav-section">Overview</div>
     <button class="nav-btn active" data-page="dashboard" onclick="navTo('dashboard',this)">◈ &nbsp;Dashboard</button>
+    <div class="nav-section">Catalog</div>
     <button class="nav-btn" data-page="products" onclick="navTo('products',this)">⊞ &nbsp;Products</button>
+    <button class="nav-btn" data-page="discover" onclick="navTo('discover',this)">🔍 &nbsp;Discover Products</button>
+    <div class="nav-section">Pinterest</div>
+    <button class="nav-btn" data-page="pins" onclick="navTo('pins',this)">📌 &nbsp;Pin Generator</button>
+    <div class="nav-section">Publish</div>
     <button class="nav-btn" data-page="snapshots" onclick="navTo('snapshots',this)">📅 &nbsp;Snapshots</button>
     <button class="nav-btn" data-page="generate" onclick="navTo('generate',this)">⚡ &nbsp;Generate Page</button>
+    <div class="nav-section">System</div>
     <button class="nav-btn" data-page="settings" onclick="navTo('settings',this)">⚙ &nbsp;Settings</button>
     <div class="sidebar-spacer"></div>
     <button class="nav-btn danger" onclick="doLogout()">⎋ &nbsp;Sign Out</button>
   </aside>
 
-  <!-- MAIN -->
   <main>
 
     <!-- DASHBOARD -->
@@ -226,8 +268,10 @@ tr:hover td{background:rgba(255,255,255,.02)}
         <div class="card-title">⚡ Quick Actions</div>
         <div class="flex wrap gap">
           <button class="btn btn-sm" onclick="openAddModal()">+ Add Product</button>
-          <button class="btn btn-sm" onclick="saveSnapshot()">📸 Save Today's Snapshot</button>
+          <button class="btn btn-sm" onclick="saveSnapshot()">📸 Save Snapshot</button>
           <button class="btn-outline btn-sm" onclick="navTo('generate',document.querySelector('[data-page=generate]'))">⚡ Generate Page</button>
+          <button class="btn-pink btn-sm" onclick="navTo('pins',document.querySelector('[data-page=pins]'))">📌 Pinterest Pins</button>
+          <button class="btn-outline btn-sm" onclick="navTo('discover',document.querySelector('[data-page=discover]'))">🔍 Discover</button>
         </div>
       </div>
       <div class="card">
@@ -239,10 +283,7 @@ tr:hover td{background:rgba(255,255,255,.02)}
     <!-- PRODUCTS -->
     <section class="page" id="page-products">
       <div class="flex items-center justify-between wrap gap" style="margin-bottom:.5rem">
-        <div>
-          <div class="page-title">Products</div>
-          <div class="page-sub">Manage your affiliate product catalog.</div>
-        </div>
+        <div><div class="page-title">Products</div><div class="page-sub">Manage your affiliate product catalog.</div></div>
         <button class="btn btn-sm" onclick="openAddModal()">+ Add Product</button>
       </div>
       <div class="search-bar">
@@ -253,7 +294,7 @@ tr:hover td{background:rgba(255,255,255,.02)}
         <div class="table-wrap">
           <table>
             <thead><tr>
-              <th>Product</th><th>Category</th><th>Price</th><th>Rating</th><th>Featured</th><th>Actions</th>
+              <th>Product</th><th>Category</th><th>Price</th><th>Rating</th><th>Featured</th><th>Pin</th><th>Actions</th>
             </tr></thead>
             <tbody id="productsTbody"></tbody>
           </table>
@@ -262,23 +303,115 @@ tr:hover td{background:rgba(255,255,255,.02)}
       </div>
     </section>
 
+    <!-- DISCOVER PRODUCTS -->
+    <section class="page" id="page-discover">
+      <div class="page-title">Discover Products</div>
+      <div class="page-sub">Search for trending niche products from Amazon — tech, education, deals and more.</div>
+      <div class="card">
+        <div class="card-title">🔍 Product Search</div>
+        <div class="form-grid" style="margin-bottom:1rem">
+          <label class="field">Search Keywords
+            <input type="text" id="discoverQuery" placeholder="e.g. AI gadgets, desk accessories, learning tools…"/>
+          </label>
+          <label class="field">Category Filter
+            <select id="discoverCategory">
+              <option value="">All Categories</option>
+              <option value="Electronics">Electronics</option>
+              <option value="Education">Education</option>
+              <option value="Home & Living">Home & Living</option>
+              <option value="Fashion">Fashion</option>
+              <option value="Health & Fitness">Health & Fitness</option>
+              <option value="Productivity">Productivity</option>
+              <option value="Gaming">Gaming</option>
+              <option value="Photography">Photography</option>
+            </select>
+          </label>
+        </div>
+        <div class="flex gap wrap">
+          <button class="btn btn-sm" onclick="discoverProducts()">🔍 Search Products</button>
+          <button class="btn-ghost btn-sm" onclick="loadTrendingProducts()">🔥 Load Trending Now</button>
+          <button class="btn-ghost btn-sm" onclick="loadDealsProducts()">💸 Load Hot Deals</button>
+        </div>
+        <div id="discoverStatus" style="margin-top:1rem;color:var(--muted);font-size:.85rem"></div>
+      </div>
+      <div id="discoverResults"></div>
+    </section>
+
+    <!-- PIN GENERATOR -->
+    <section class="page" id="page-pins">
+      <div class="page-title">📌 Pinterest Pin Generator</div>
+      <div class="page-sub">Generate individual product pins and combined site pins with copy-paste essentials.</div>
+
+      <div class="tabs">
+        <button class="tab active" onclick="switchPinTab('individual',this)">Individual Pins</button>
+        <button class="tab" onclick="switchPinTab('combined',this)">Combined Site Pin</button>
+        <button class="tab" onclick="switchPinTab('settings',this)">Pin Settings</button>
+      </div>
+
+      <!-- Individual Pins -->
+      <div class="tab-panel active" id="pinTab-individual">
+        <div class="flex items-center justify-between wrap gap" style="margin-bottom:1rem">
+          <p style="color:var(--muted);font-size:.88rem">One pin per product — includes text, hashtags, and board suggestions.</p>
+          <button class="btn btn-sm" onclick="generateAllIndividualPins()">📌 Generate All Pins</button>
+        </div>
+        <div id="individualPinsContainer">
+          <div class="empty"><div class="empty-icon">📌</div>Click "Generate All Pins" or add products first.</div>
+        </div>
+      </div>
+
+      <!-- Combined Site Pin -->
+      <div class="tab-panel" id="pinTab-combined">
+        <div class="card">
+          <div class="card-title">🖼 Combined Site Pin</div>
+          <p style="color:var(--muted);font-size:.85rem;margin-bottom:1.2rem">One master pin that showcases your whole site — use this when publishing a new snapshot or going live.</p>
+          <button class="btn btn-sm" onclick="generateCombinedPin()">⚡ Generate Combined Pin</button>
+        </div>
+        <div id="combinedPinContainer"></div>
+      </div>
+
+      <!-- Pin Settings -->
+      <div class="tab-panel" id="pinTab-settings">
+        <div class="card">
+          <div class="card-title">⚙ Pin Configuration</div>
+          <div class="form-grid" style="margin-bottom:1rem">
+            <label class="field">Site Name / Brand
+              <input type="text" id="pinSiteName" placeholder="DeliveryZone" value="DeliveryZone"/>
+            </label>
+            <label class="field">Site URL
+              <input type="url" id="pinSiteUrl" placeholder="https://yoursite.com"/>
+            </label>
+            <label class="field">Affiliate Tag / ID
+              <input type="text" id="pinAffiliateTag" placeholder="your-tag-20"/>
+            </label>
+            <label class="field">Pinterest Board Name
+              <input type="text" id="pinBoardName" placeholder="Best Amazon Deals 2026"/>
+            </label>
+          </div>
+          <label class="field" style="margin-bottom:1rem">Default Hashtags (comma-separated)
+            <input type="text" id="pinHashtags" value="#AmazonDeals, #AffiliateMarketing, #BestDeals, #TechDeals, #ShoppingTips"/>
+          </label>
+          <label class="field" style="margin-bottom:1rem">Site Description (for combined pin)
+            <textarea id="pinSiteDesc" placeholder="Curated Amazon affiliate deals on tech, education, home & more. Updated daily."></textarea>
+          </label>
+          <button class="btn btn-sm" onclick="savePinSettings()">💾 Save Pin Settings</button>
+        </div>
+      </div>
+    </section>
+
     <!-- SNAPSHOTS -->
     <section class="page" id="page-snapshots">
       <div class="flex items-center justify-between wrap gap" style="margin-bottom:.5rem">
-        <div>
-          <div class="page-title">Snapshots</div>
-          <div class="page-sub">Date-stamped catalog history — each snapshot preserves the exact products for that date.</div>
-        </div>
+        <div><div class="page-title">Snapshots</div><div class="page-sub">Date-stamped catalog history — preserves exact products per date.</div></div>
         <button class="btn btn-sm" onclick="saveSnapshot()">📸 Save Today</button>
       </div>
-      <input type="text" placeholder="Filter by date (e.g. 2025-04)…" style="max-width:280px;margin-bottom:1rem" oninput="renderSnapshots(this.value)"/>
+      <input type="text" placeholder="Filter by date (e.g. 2026-04)…" style="max-width:280px;margin-bottom:1rem" oninput="renderSnapshots(this.value)"/>
       <div id="snapshotsList"></div>
     </section>
 
     <!-- GENERATE -->
     <section class="page" id="page-generate">
       <div class="page-title">Generate Page</div>
-      <div class="page-sub">Build a deployable HTML file from any snapshot or from the live catalog.</div>
+      <div class="page-sub">Build a deployable index.html from any snapshot or live catalog.</div>
       <div class="card">
         <div class="card-title">⚡ From Live Catalog</div>
         <p style="color:var(--muted);font-size:.88rem;margin-bottom:1rem" id="liveGenDesc"></p>
@@ -292,9 +425,9 @@ tr:hover td{background:rgba(255,255,255,.02)}
         <div class="card-title">📌 How to Deploy</div>
         <div style="color:var(--muted);font-size:.87rem;line-height:2">
           1. Generate → Preview → click <strong style="color:var(--text)">⬇ Download HTML</strong><br>
-          2. Rename it to <code style="color:var(--accent)">index.html</code> and push to your GitHub repo<br>
+          2. Rename to <code style="color:var(--accent)">index.html</code> and push to your GitHub repo<br>
           3. Enable <strong style="color:var(--text)">GitHub Pages</strong> (Settings → Pages → main branch)<br>
-          4. Your site is live at <code style="color:var(--accent)">https://ArushPalSingh.github.io/affiliate-site</code>
+          4. Your site goes live at your GitHub Pages URL
         </div>
       </div>
     </section>
@@ -307,8 +440,8 @@ tr:hover td{background:rgba(255,255,255,.02)}
         <div class="card-title">🔐 Change Admin Password</div>
         <div id="pwAlert"></div>
         <div class="form-grid" style="margin-bottom:1rem">
-          <label class="field">New Password<input type="password" id="newPw1" placeholder="Min. 8 characters"/></label>
-          <label class="field">Confirm Password<input type="password" id="newPw2" placeholder="Repeat password"/></label>
+          <label class="field">New Password (min 12 chars)<input type="password" id="newPw1" placeholder="Min. 12 characters" autocomplete="new-password"/></label>
+          <label class="field">Confirm Password<input type="password" id="newPw2" placeholder="Repeat password" autocomplete="new-password"/></label>
         </div>
         <button class="btn btn-sm" onclick="changePassword()">Update Password</button>
       </div>
@@ -318,8 +451,10 @@ tr:hover td{background:rgba(255,255,255,.02)}
           • Passwords hashed with <strong style="color:var(--text)">SHA-256</strong> via Web Crypto API<br>
           • Sessions expire after <strong style="color:var(--text)">30 minutes</strong> of inactivity<br>
           • Login locked for <strong style="color:var(--text)">5 minutes</strong> after 5 failed attempts<br>
+          • CSRF-safe: admin runs client-side only — no server calls<br>
           • All data stored in <strong style="color:var(--text)">localStorage</strong> — private to your browser<br>
-          • No data sent to any server
+          • HTML generation uses structured templates, not innerHTML injection<br>
+          • Password must be at least <strong style="color:var(--text)">12 characters</strong>
         </div>
       </div>
       <div class="card">
@@ -328,15 +463,16 @@ tr:hover td{background:rgba(255,255,255,.02)}
           <button class="btn btn-sm" onclick="exportData()">⬇ Export All Data (JSON)</button>
           <button class="btn-ghost btn-sm" onclick="importData()">⬆ Import Data (JSON)</button>
           <button class="btn-danger btn-sm" onclick="deleteAllSnapshots()">🗑 Delete All Snapshots</button>
+          <button class="btn-danger btn-sm" onclick="resetToSamples()">↩ Reset to Sample Products</button>
         </div>
         <input type="file" id="importFile" accept=".json" style="display:none" onchange="handleImport(this)"/>
       </div>
       <div class="card">
         <div class="card-title">ℹ️ About</div>
         <div style="color:var(--muted);font-size:.87rem;line-height:2">
-          DeliveryZone Admin v1.0<br>
-          GitHub: <a href="https://github.com/ArushPalSingh/affiliate-site" target="_blank" style="color:var(--accent)">ArushPalSingh/affiliate-site</a><br>
-          Pure HTML/CSS/JS — no framework required
+          DeliveryZone Admin v2.0<br>
+          Pure HTML/CSS/JS — no framework required<br>
+          Admin generates index.html for public deployment
         </div>
       </div>
     </section>
@@ -344,10 +480,10 @@ tr:hover td{background:rgba(255,255,255,.02)}
   </main>
 </div>
 
-<!-- ═══════════════ TOAST ═══════════════ -->
+<!-- TOAST -->
 <div id="toast"></div>
 
-<!-- ═══════════════ PRODUCT MODAL ═══════════════ -->
+<!-- PRODUCT MODAL -->
 <div class="overlay" id="productModal">
   <div class="modal">
     <div class="modal-header">
@@ -358,20 +494,18 @@ tr:hover td{background:rgba(255,255,255,.02)}
       <div id="productFormAlert"></div>
       <input type="hidden" id="editId"/>
       <div class="form-grid" style="margin-bottom:1rem">
-        <label class="field">Product Name *<input type="text" id="fName" placeholder="Sony WH-1000XM5…"/></label>
-        <label class="field">Category *<input type="text" id="fCategory" placeholder="Electronics, Fashion…"/></label>
-        <label class="field">Price *<input type="text" id="fPrice" placeholder="$199.99"/></label>
-        <label class="field">Original Price<input type="text" id="fOriginal" placeholder="$349.99 (optional)"/></label>
+        <label class="field">Product Name *<input type="text" id="fName" placeholder="Sony WH-1000XM5…" maxlength="120"/></label>
+        <label class="field">Category *<input type="text" id="fCategory" placeholder="Electronics, Fashion…" maxlength="60"/></label>
+        <label class="field">Price *<input type="text" id="fPrice" placeholder="$199.99" maxlength="20"/></label>
+        <label class="field">Original Price<input type="text" id="fOriginal" placeholder="$349.99 (optional)" maxlength="20"/></label>
         <label class="field">Rating (1–5)<input type="number" id="fRating" min="1" max="5" step="0.1" placeholder="4.5"/></label>
-        <label class="field">Image URL<input type="url" id="fImage" placeholder="https://…"/></label>
+        <label class="field">Image URL<input type="url" id="fImage" placeholder="https://…" maxlength="500"/></label>
       </div>
-      <label class="field" style="margin-bottom:1rem">
-        Affiliate Link *
-        <input type="url" id="fLink" placeholder="https://amzn.to/…"/>
-      </label>
-      <label class="field" style="margin-bottom:1rem">
-        Description
-        <textarea id="fDesc" placeholder="Why you'll love this product…"></textarea>
+      <label class="field" style="margin-bottom:1rem">Affiliate Link *<input type="url" id="fLink" placeholder="https://amzn.to/…" maxlength="500"/></label>
+      <label class="field" style="margin-bottom:1rem">Description<textarea id="fDesc" placeholder="Why you'll love this product…" maxlength="300"></textarea></label>
+      <label class="field" style="margin-bottom:1rem">Pinterest Pin Text
+        <textarea id="fPinText" placeholder="Great for working from home! This [product] changed my setup completely. Save this for later! 📌" maxlength="500"></textarea>
+        <div class="char-count" id="pinTextCount">0 / 500</div>
       </label>
       <label style="display:flex;align-items:center;gap:.6rem;cursor:pointer;font-size:.88rem;color:var(--muted);margin-bottom:1.5rem">
         <input type="checkbox" id="fFeatured"/> Mark as Featured Product
@@ -384,7 +518,18 @@ tr:hover td{background:rgba(255,255,255,.02)}
   </div>
 </div>
 
-<!-- ═══════════════ PREVIEW MODAL ═══════════════ -->
+<!-- INDIVIDUAL PIN MODAL -->
+<div class="overlay" id="pinModal">
+  <div class="modal modal-lg">
+    <div class="modal-header">
+      <h3 id="pinModalTitle">📌 Pin — Product Name</h3>
+      <button class="modal-close" onclick="closeModal('pinModal')">✕</button>
+    </div>
+    <div class="modal-body" id="pinModalBody"></div>
+  </div>
+</div>
+
+<!-- PREVIEW MODAL -->
 <div class="overlay" id="previewModal">
   <div class="modal modal-lg" style="display:flex;flex-direction:column;max-height:94vh">
     <div class="modal-header">
@@ -395,137 +540,186 @@ tr:hover td{background:rgba(255,255,255,.02)}
       </div>
     </div>
     <div style="padding:.6rem 1.5rem;color:var(--muted);font-size:.8rem;border-bottom:1px solid var(--border)">
-      Live preview — download to deploy on GitHub Pages or any static host.
+      Live preview of generated index.html — download to deploy.
     </div>
-    <iframe id="previewFrame" title="Page Preview"></iframe>
+    <iframe id="previewFrame" title="Page Preview" sandbox="allow-scripts allow-same-origin"></iframe>
   </div>
 </div>
 
 <script>
-// ═══════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════
 //  CONSTANTS & STATE
-// ═══════════════════════════════════════════════
-const PW_KEY     = 'dz_pw_hash';
-const PRODS_KEY  = 'dz_products';
-const SNAP_PFX   = 'dz_snap_';
-const SESSION_KEY= 'dz_session';
-const SESSION_TTL= 30 * 60 * 1000;
-const DEFAULT_PW = 'DeliveryZone2025!';
+// ═══════════════════════════════════════════════════════════
+const PW_KEY      = 'dz_pw_hash';
+const PRODS_KEY   = 'dz_products';
+const SNAP_PFX    = 'dz_snap_';
+const SESSION_KEY = 'dz_session';
+const PIN_CFG_KEY = 'dz_pin_config';
+const SESSION_TTL = 30 * 60 * 1000; // 30 minutes
+const DEFAULT_PW  = 'DeliveryZone2025!';
+const MIN_PW_LEN  = 12;
+
 let loginAttempts = 0;
 let loginLocked   = false;
+let lockTimer     = null;
 let currentPreviewHTML = '';
 let currentPreviewDate = '';
 
+// ── SAMPLE PRODUCTS (Updated with 2026 trending products) ──
 const SAMPLE_PRODUCTS = [
-  {id:1,name:"Sony WH-1000XM5",category:"Electronics",price:"$279.99",originalPrice:"$399.99",rating:4.8,image:"https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=600&q=80",link:"#",description:"Industry-leading noise cancellation with 30-hour battery life.",featured:true},
-  {id:2,name:"Ember Temperature Control Mug",category:"Home & Living",price:"$99.95",originalPrice:"$129.99",rating:4.6,image:"https://images.unsplash.com/photo-1514228742587-6b1558fcca3d?w=600&q=80",link:"#",description:"Keep your coffee at the perfect temperature all morning.",featured:false},
-  {id:3,name:"Nike Air Zoom Pegasus 41",category:"Fashion",price:"$130.00",originalPrice:"",rating:4.5,image:"https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=600&q=80",link:"#",description:"Responsive cushioning for everyday training runs.",featured:false},
-  {id:4,name:"Anker 65W USB-C Charger",category:"Electronics",price:"$35.99",originalPrice:"$55.99",rating:4.7,image:"https://images.unsplash.com/photo-1625772452859-1c03d5bf1137?w=600&q=80",link:"#",description:"Charge laptop, phone and tablet simultaneously.",featured:false},
-  {id:5,name:"Instant Pot Duo 7-in-1",category:"Home & Living",price:"$89.95",originalPrice:"$119.99",rating:4.9,image:"https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=600&q=80",link:"#",description:"Pressure cook, slow cook, sauté and steam — all in one.",featured:false},
+  {id:1,name:"Sony WH-1000XM5 Headphones",category:"Electronics",price:"$279.99",originalPrice:"$399.99",rating:4.8,image:"https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=600&q=80",link:"https://amzn.to/sony-xm5",description:"Industry-leading noise cancellation with 30-hour battery life and call clarity.",featured:true,pinText:"These headphones CHANGED my work-from-home life! Crystal clear calls + zero distractions. Worth every penny 🎧"},
+  {id:2,name:"Apple Watch Series 11",category:"Electronics",price:"$329.00",originalPrice:"$399.00",rating:4.9,image:"https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=600&q=80",link:"https://amzn.to/apple-watch-s11",description:"24-hour battery, advanced health monitoring, sleep score features. Best price ever.",featured:false,pinText:"Apple Watch Series 11 hits a NEW record low price during Amazon Spring Sale! Save $70 ⌚ Tap to grab it!"},
+  {id:3,name:"Anker 65W USB-C GaN Charger",category:"Electronics",price:"$35.99",originalPrice:"$55.99",rating:4.7,image:"https://images.unsplash.com/photo-1625772452859-1c03d5bf1137?w=600&q=80",link:"https://amzn.to/anker-65w",description:"Charge laptop, phone and tablet simultaneously. Tiny adapter, massive power.",featured:false,pinText:"One charger to rule them all! This Anker 65W charges your laptop, phone AND tablet at once. 50% off this week 🔌"},
+  {id:4,name:"Uperfect 2K Portable Monitor",category:"Electronics",price:"$134.00",originalPrice:"$190.00",rating:4.6,image:"https://images.unsplash.com/photo-1527443224154-c4a3942d3acf?w=600&q=80",link:"https://amzn.to/uperfect-monitor",description:"16-inch 2560×1600 at 120Hz, 400 nits. Works with laptop, phone, Switch.",featured:false,pinText:"Double your productivity anywhere with this portable 2K monitor! 30% off during Amazon Spring Sale 🖥️ Save this pin!"},
+  {id:5,name:"Kindle Paperwhite (2025)",category:"Education",price:"$139.99",originalPrice:"$159.99",rating:4.8,image:"https://images.unsplash.com/photo-1512820790803-83ca734da794?w=600&q=80",link:"https://amzn.to/kindle-pw",description:"Glare-free display, weeks of battery, waterproof. 1,000s of books in your pocket.",featured:false,pinText:"Read more books this year! Kindle Paperwhite is at its lowest price — weeks of battery + waterproof design 📚 Link in bio!"},
+  {id:6,name:"DJI Osmo Mobile 7 Gimbal",category:"Photography",price:"$79.00",originalPrice:"$109.00",rating:4.7,image:"https://images.unsplash.com/photo-1516035069371-29a1b244cc32?w=600&q=80",link:"https://amzn.to/dji-osmo7",description:"3-axis stabilizer with ActiveTrack 7.0. Turn shaky footage into cinema-quality video.",featured:false,pinText:"Your content quality will SKYROCKET with this DJI gimbal! Save $30 right now. Perfect for creators 🎬"},
+  {id:7,name:"Razer Naga V2 Hyperspeed Mouse",category:"Gaming",price:"$64.97",originalPrice:"$99.99",rating:4.6,image:"https://images.unsplash.com/photo-1527814050087-3793815479db?w=600&q=80",link:"https://amzn.to/razer-naga-v2",description:"19 programmable buttons, wireless MMO/MOBA gaming mouse. 35% off.",featured:false,pinText:"Level up your gaming setup! Razer Naga V2 is 35% OFF — 19 buttons, zero lag wireless ⚡ Limited time deal!"},
+  {id:8,name:"NordVPN 2-Year Plan",category:"Education",price:"$2.99",originalPrice:"$11.99",rating:4.5,image:"https://images.unsplash.com/photo-1563013544-824ae1b704d3?w=600&q=80",link:"https://nordvpn.com",description:"76% off for students, grads and teachers. Elite privacy protection for 2 years.",featured:false,pinText:"Stay safe online for less than a coffee/month! NordVPN 76% student discount 🔒 Best cybersecurity deal of 2026!"},
+  {id:9,name:"Ember Temperature Control Mug 2",category:"Home & Living",price:"$99.95",originalPrice:"$129.99",rating:4.6,image:"https://images.unsplash.com/photo-1514228742587-6b1558fcca3d?w=600&q=80",link:"https://amzn.to/ember-mug2",description:"Smart mug keeps your coffee at the perfect temperature via app. 3-hour battery.",featured:false,pinText:"Never drink cold coffee again! Ember Mug 2 keeps your drink PERFECT all morning ☕ Such a game changer!"},
+  {id:10,name:"XGIMI MoGo 3 Pro Projector",category:"Home & Living",price:"$439.00",originalPrice:"$499.00",rating:4.7,image:"https://images.unsplash.com/photo-1551816230-ef5deaed4a26?w=600&q=80",link:"https://amzn.to/xgimi-mogo3",description:"Best portable projector under $500. 120-inch screen, Android TV built in.",featured:false,pinText:"Movie nights just got an UPGRADE! XGIMI projector = 120-inch screen anywhere 🎥 $60 off right now — save this!"},
+  {id:11,name:"Fujifilm X Half Camera",category:"Photography",price:"$749.00",originalPrice:"$850.00",rating:4.5,image:"https://images.unsplash.com/photo-1502920917128-1aa500764cbd?w=600&q=80",link:"https://amzn.to/fujifilm-xhalf",description:"Half-frame film aesthetic digital camera. First major discount since launch.",featured:false,pinText:"The Fujifilm X Half just hit its FIRST discount! Film aesthetic, digital convenience — this is the camera of 2026 📷"},
+  {id:12,name:"Philips Hue Bridge Pro Starter Kit",category:"Home & Living",price:"$149.00",originalPrice:"$182.00",rating:4.8,image:"https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=600&q=80",link:"https://amzn.to/hue-bridge-pro",description:"Most innovative product of 2026 — turns Hue bulbs into motion sensors for smart security.",featured:false,pinText:"Turn your lights into a SECURITY SYSTEM! Philips Hue Bridge Pro — most innovative smart home product of 2026 💡 Save $33!"},
 ];
 
-// ═══════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════
 //  CRYPTO HELPERS
-// ═══════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════
 async function sha256(str){
-  const buf=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(str));
+  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(str));
   return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');
 }
 
-// ═══════════════════════════════════════════════
-//  STORAGE HELPERS
-// ═══════════════════════════════════════════════
-function lsGet(key){try{const v=localStorage.getItem(key);return v?JSON.parse(v):null}catch{return null}}
-function lsSet(key,val){try{localStorage.setItem(key,JSON.stringify(val))}catch(e){showToast('⚠️ Storage full! Try deleting old snapshots.');}}
-function lsDel(key){localStorage.removeItem(key)}
-function getSnapKeys(){return Object.keys(localStorage).filter(k=>k.startsWith(SNAP_PFX)).sort((a,b)=>b.localeCompare(a))}
+// ═══════════════════════════════════════════════════════════
+//  STORAGE HELPERS — with try/catch on all ops
+// ═══════════════════════════════════════════════════════════
+function lsGet(key){
+  try{const v=localStorage.getItem(key);return v?JSON.parse(v):null}catch{return null}
+}
+function lsSet(key,val){
+  try{localStorage.setItem(key,JSON.stringify(val));return true}
+  catch(e){showToast('⚠️ Storage full! Delete old snapshots.');return false}
+}
+function lsDel(key){try{localStorage.removeItem(key)}catch{}}
+function getSnapKeys(){
+  try{return Object.keys(localStorage).filter(k=>k.startsWith(SNAP_PFX)).sort((a,b)=>b.localeCompare(a))}
+  catch{return[]}
+}
 
-// ═══════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════
 //  SESSION
-// ═══════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════
 function getSession(){
   try{
-    const s=JSON.parse(sessionStorage.getItem(SESSION_KEY)||'null');
-    if(s&&Date.now()-s.ts<SESSION_TTL)return s;
-    sessionStorage.removeItem(SESSION_KEY);return null;
+    const s = JSON.parse(sessionStorage.getItem(SESSION_KEY)||'null');
+    if(s && Date.now()-s.ts < SESSION_TTL) return s;
+    sessionStorage.removeItem(SESSION_KEY); return null;
   }catch{return null}
 }
-function setSession(){sessionStorage.setItem(SESSION_KEY,JSON.stringify({ts:Date.now()}))}
-function clearSession(){sessionStorage.removeItem(SESSION_KEY)}
+function setSession(){
+  try{sessionStorage.setItem(SESSION_KEY,JSON.stringify({ts:Date.now()}))}catch{}
+}
+function clearSession(){try{sessionStorage.removeItem(SESSION_KEY)}catch{}}
 function refreshSession(){if(getSession())setSession()}
 
-// ═══════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════
 //  DATE HELPERS
-// ═══════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════
 function todayStr(){return new Date().toISOString().split('T')[0]}
 function fmtDate(d){
   try{return new Date(d+'T00:00:00').toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'})}
   catch{return d}
 }
 
-// ═══════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════
 //  TOAST
-// ═══════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════
 let toastTimer;
 function showToast(msg){
-  const t=document.getElementById('toast');
-  t.textContent=msg;t.classList.add('show');
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
   clearTimeout(toastTimer);
-  toastTimer=setTimeout(()=>t.classList.remove('show'),3000);
+  toastTimer = setTimeout(()=>t.classList.remove('show'), 3200);
 }
 
-// ═══════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════
+//  INPUT SANITIZATION
+// ═══════════════════════════════════════════════════════════
+function esc(s){
+  const d = document.createElement('div');
+  d.textContent = String(s||'');
+  return d.innerHTML;
+}
+function sanitizeUrl(u){
+  if(!u) return '#';
+  const url = String(u).trim();
+  if(!/^https?:\/\//i.test(url)) return '#';
+  return url.replace(/[<>"']/g,'');
+}
+function validateText(s, maxLen=500){
+  return String(s||'').trim().slice(0, maxLen);
+}
+
+// ═══════════════════════════════════════════════════════════
 //  LOGIN
-// ═══════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════
 async function doLogin(){
   if(loginLocked){showLoginErr('Too many failed attempts. Wait 5 minutes.');return}
-  const pw=document.getElementById('loginPw').value;
+  const pw = document.getElementById('loginPw').value;
   if(!pw){showLoginErr('Please enter your password.');return}
 
-  let storedHash=lsGet(PW_KEY);
-  if(!storedHash){storedHash=await sha256(DEFAULT_PW);lsSet(PW_KEY,storedHash)}
+  document.getElementById('loginBtn').textContent = 'Signing in…';
+  document.getElementById('loginBtn').disabled = true;
 
-  const hash=await sha256(pw);
-  if(hash===storedHash){
-    loginAttempts=0;
+  let storedHash = lsGet(PW_KEY);
+  if(!storedHash){ storedHash = await sha256(DEFAULT_PW); lsSet(PW_KEY, storedHash); }
+
+  const hash = await sha256(pw);
+  if(hash === storedHash){
+    loginAttempts = 0;
     setSession();
-    document.getElementById('loginScreen').style.display='none';
+    document.getElementById('loginScreen').style.display = 'none';
     document.getElementById('adminShell').classList.add('visible');
     initAdmin();
   } else {
     loginAttempts++;
-    if(loginAttempts>=5){
-      loginLocked=true;
+    document.getElementById('loginBtn').textContent = 'Sign In →';
+    document.getElementById('loginBtn').disabled = false;
+    if(loginAttempts >= 5){
+      loginLocked = true;
       showLoginErr('Too many failed attempts. Locked for 5 minutes.');
-      setTimeout(()=>{loginLocked=false;loginAttempts=0;hideLoginErr()},5*60*1000);
+      lockTimer = setTimeout(()=>{loginLocked=false;loginAttempts=0;hideLoginErr();},5*60*1000);
     } else {
       showLoginErr(`Incorrect password. ${5-loginAttempts} attempt(s) remaining.`);
     }
   }
 }
-function showLoginErr(msg){const el=document.getElementById('loginError');el.textContent='🔒 '+msg;el.classList.remove('hidden')}
-function hideLoginErr(){document.getElementById('loginError').classList.add('hidden')}
-document.getElementById('loginPw').addEventListener('keydown',e=>{if(e.key==='Enter')doLogin()});
+function showLoginErr(msg){
+  const el = document.getElementById('loginError');
+  el.textContent = '🔒 '+msg; el.classList.remove('hidden');
+}
+function hideLoginErr(){ document.getElementById('loginError').classList.add('hidden'); }
+document.getElementById('loginPw').addEventListener('keydown', e=>{ if(e.key==='Enter') doLogin(); });
+document.getElementById('loginBtn').addEventListener('click', doLogin);
 
-function doLogout(){clearSession();location.reload()}
+function doLogout(){ clearSession(); location.reload(); }
 
-// ═══════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════
 //  INIT
-// ═══════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════
 function initAdmin(){
-  if(!lsGet(PRODS_KEY))lsSet(PRODS_KEY,SAMPLE_PRODUCTS);
+  if(!lsGet(PRODS_KEY)) lsSet(PRODS_KEY, SAMPLE_PRODUCTS);
+  loadPinSettings();
   renderDashboard();
   renderProductsTable();
   renderSnapshots();
   renderGeneratePage();
-  document.addEventListener('click',refreshSession);
-  document.addEventListener('keydown',refreshSession);
-  // Auto-logout check every minute
-  setInterval(()=>{if(!getSession())doLogout()},60000);
+  setupPinTextCounter();
+  document.addEventListener('click', refreshSession);
+  document.addEventListener('keydown', refreshSession);
+  setInterval(()=>{ if(!getSession()) doLogout(); }, 60000);
 }
 
-// Auto-login if session active
-window.addEventListener('DOMContentLoaded',()=>{
+window.addEventListener('DOMContentLoaded', ()=>{
   if(getSession()){
     document.getElementById('loginScreen').style.display='none';
     document.getElementById('adminShell').classList.add('visible');
@@ -533,39 +727,47 @@ window.addEventListener('DOMContentLoaded',()=>{
   }
 });
 
-// ═══════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════
 //  NAVIGATION
-// ═══════════════════════════════════════════════
-function navTo(pageId,btn){
+// ═══════════════════════════════════════════════════════════
+function navTo(pageId, btn){
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
-  document.getElementById('page-'+pageId).classList.add('active');
-  if(btn)btn.classList.add('active');
-  if(pageId==='dashboard')renderDashboard();
-  if(pageId==='snapshots')renderSnapshots();
-  if(pageId==='generate')renderGeneratePage();
+  const page = document.getElementById('page-'+pageId);
+  if(page) page.classList.add('active');
+  if(btn) btn.classList.add('active');
+  if(pageId==='dashboard') renderDashboard();
+  if(pageId==='snapshots') renderSnapshots();
+  if(pageId==='generate') renderGeneratePage();
+  if(pageId==='pins') renderIndividualPinsPreview();
 }
 
-// ═══════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════
 //  PRODUCTS
-// ═══════════════════════════════════════════════
-function getProducts(){return lsGet(PRODS_KEY)||[]}
-function saveProducts(arr){lsSet(PRODS_KEY,arr)}
+// ═══════════════════════════════════════════════════════════
+function getProducts(){ return lsGet(PRODS_KEY)||[]; }
+function saveProducts(arr){ lsSet(PRODS_KEY, arr); }
 
 function renderProductsTable(filter=''){
-  const products=getProducts();
-  const tbody=document.getElementById('productsTbody');
-  const empty=document.getElementById('productsEmpty');
-  const filtered=filter?products.filter(p=>p.name.toLowerCase().includes(filter)||p.category.toLowerCase().includes(filter)):products;
+  const products = getProducts();
+  const tbody = document.getElementById('productsTbody');
+  const empty = document.getElementById('productsEmpty');
+  const q = filter.toLowerCase();
+  const filtered = q ? products.filter(p=>
+    p.name.toLowerCase().includes(q) ||
+    p.category.toLowerCase().includes(q)
+  ) : products;
 
-  if(!filtered.length){tbody.innerHTML='';empty.classList.remove('hidden');return}
+  if(!filtered.length){ tbody.innerHTML=''; empty.classList.remove('hidden'); return; }
   empty.classList.add('hidden');
 
-  tbody.innerHTML=filtered.map(p=>`
+  tbody.innerHTML = filtered.map(p=>`
     <tr>
       <td>
         <div class="flex items-center gap-sm">
-          ${p.image?`<img src="${p.image}" class="thumb" alt="" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"><div class="thumb-ph" style="display:none">📦</div>`:`<div class="thumb-ph">📦</div>`}
+          ${p.image
+            ? `<img src="${sanitizeUrl(p.image)}" class="thumb" alt="" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"><div class="thumb-ph" style="display:none">📦</div>`
+            : `<div class="thumb-ph">📦</div>`}
           <span style="font-weight:500;font-size:.87rem">${esc(p.name)}</span>
         </div>
       </td>
@@ -573,125 +775,248 @@ function renderProductsTable(filter=''){
       <td><span style="color:var(--accent);font-weight:700">${esc(p.price)}</span>${p.originalPrice?`<span style="color:var(--dim);text-decoration:line-through;font-size:.78rem;margin-left:.4rem">${esc(p.originalPrice)}</span>`:''}</td>
       <td>${stars(p.rating)} ${p.rating.toFixed(1)}</td>
       <td>${p.featured?'<span class="badge badge-green">⭐ Yes</span>':'<span class="badge badge-gray">No</span>'}</td>
+      <td><button class="btn-pink btn-sm" onclick="openPinModal(${p.id})">📌 Pin</button></td>
       <td>
         <div class="flex gap-sm">
           <button class="btn btn-sm" onclick="openEditModal(${p.id})">Edit</button>
-          <button class="btn-danger btn-sm" onclick="deleteProduct(${p.id})">Delete</button>
+          <button class="btn-danger" onclick="deleteProduct(${p.id})" style="font-size:.78rem;padding:.42rem .9rem">Delete</button>
         </div>
       </td>
     </tr>
   `).join('');
 }
 
-function filterProductTable(v){renderProductsTable(v.toLowerCase())}
+function filterProductTable(v){ renderProductsTable(v); }
 
 function stars(r){
-  const f=Math.floor(r),h=r%1>=0.5;
+  const f=Math.floor(r), h=r%1>=0.5;
   return `<span style="color:var(--accent)">${'★'.repeat(f)}${h?'½':''}${'☆'.repeat(5-f-(h?1:0))}</span>`;
 }
 
-function esc(s){const d=document.createElement('div');d.textContent=s||'';return d.innerHTML}
-
-// ── MODAL ─────────────────────────────────────
+// ── PRODUCT MODAL ──────────────────────────────
 function openAddModal(){
-  document.getElementById('modalTitle').textContent='Add Product';
+  document.getElementById('modalTitle').textContent = 'Add Product';
   clearForm();
-  document.getElementById('productFormAlert').innerHTML='';
+  document.getElementById('productFormAlert').innerHTML = '';
   openModal('productModal');
 }
+
 function openEditModal(id){
-  const p=getProducts().find(x=>x.id===id);
-  if(!p)return;
-  document.getElementById('modalTitle').textContent='Edit Product';
-  document.getElementById('editId').value=p.id;
-  document.getElementById('fName').value=p.name||'';
-  document.getElementById('fCategory').value=p.category||'';
-  document.getElementById('fPrice').value=p.price||'';
-  document.getElementById('fOriginal').value=p.originalPrice||'';
-  document.getElementById('fRating').value=p.rating||4.5;
-  document.getElementById('fImage').value=p.image||'';
-  document.getElementById('fLink').value=p.link||'';
-  document.getElementById('fDesc').value=p.description||'';
-  document.getElementById('fFeatured').checked=!!p.featured;
-  document.getElementById('productFormAlert').innerHTML='';
+  const p = getProducts().find(x=>x.id===id);
+  if(!p) return;
+  document.getElementById('modalTitle').textContent = 'Edit Product';
+  document.getElementById('editId').value = p.id;
+  document.getElementById('fName').value = p.name||'';
+  document.getElementById('fCategory').value = p.category||'';
+  document.getElementById('fPrice').value = p.price||'';
+  document.getElementById('fOriginal').value = p.originalPrice||'';
+  document.getElementById('fRating').value = p.rating||4.5;
+  document.getElementById('fImage').value = p.image||'';
+  document.getElementById('fLink').value = p.link||'';
+  document.getElementById('fDesc').value = p.description||'';
+  document.getElementById('fPinText').value = p.pinText||'';
+  document.getElementById('fFeatured').checked = !!p.featured;
+  document.getElementById('productFormAlert').innerHTML = '';
+  updatePinTextCount();
   openModal('productModal');
 }
-function clearForm(){
-  ['fName','fCategory','fPrice','fOriginal','fImage','fLink','fDesc'].forEach(id=>document.getElementById(id).value='');
-  document.getElementById('fRating').value=4.5;
-  document.getElementById('fFeatured').checked=false;
-  document.getElementById('editId').value='';
+
+function setupPinTextCounter(){
+  const ta = document.getElementById('fPinText');
+  if(ta) ta.addEventListener('input', updatePinTextCount);
 }
+
+function updatePinTextCount(){
+  const ta = document.getElementById('fPinText');
+  const cnt = document.getElementById('pinTextCount');
+  if(!ta||!cnt) return;
+  const len = ta.value.length;
+  cnt.textContent = `${len} / 500`;
+  cnt.className = 'char-count' + (len>450?' warn':'') + (len>=500?' over':'');
+}
+
+function clearForm(){
+  ['fName','fCategory','fPrice','fOriginal','fImage','fLink','fDesc','fPinText'].forEach(id=>{
+    const el = document.getElementById(id);
+    if(el) el.value = '';
+  });
+  document.getElementById('fRating').value = 4.5;
+  document.getElementById('fFeatured').checked = false;
+  document.getElementById('editId').value = '';
+  updatePinTextCount();
+}
+
 function submitProduct(){
-  const name=document.getElementById('fName').value.trim();
-  const category=document.getElementById('fCategory').value.trim();
-  const price=document.getElementById('fPrice').value.trim();
-  const link=document.getElementById('fLink').value.trim();
-  const alertEl=document.getElementById('productFormAlert');
-  if(!name||!category||!price||!link){
-    alertEl.innerHTML='<div class="alert alert-error">Name, Category, Price and Affiliate Link are required.</div>';return;
+  const name     = validateText(document.getElementById('fName').value, 120);
+  const category = validateText(document.getElementById('fCategory').value, 60);
+  const price    = validateText(document.getElementById('fPrice').value, 20);
+  const link     = sanitizeUrl(document.getElementById('fLink').value);
+  const alertEl  = document.getElementById('productFormAlert');
+
+  if(!name || !category || !price){
+    alertEl.innerHTML = '<div class="alert alert-error">Name, Category and Price are required.</div>'; return;
   }
-  const editId=document.getElementById('editId').value;
-  const prod={
-    id:editId?Number(editId):Date.now(),
-    name,category,price,
-    originalPrice:document.getElementById('fOriginal').value.trim(),
-    rating:Math.min(5,Math.max(1,parseFloat(document.getElementById('fRating').value)||4.0)),
-    image:document.getElementById('fImage').value.trim(),
+  if(link === '#'){
+    alertEl.innerHTML = '<div class="alert alert-error">A valid affiliate link (https://…) is required.</div>'; return;
+  }
+
+  const editId = document.getElementById('editId').value;
+  const prod = {
+    id: editId ? Number(editId) : Date.now(),
+    name, category, price,
+    originalPrice: validateText(document.getElementById('fOriginal').value, 20),
+    rating: Math.min(5, Math.max(1, parseFloat(document.getElementById('fRating').value)||4.0)),
+    image: sanitizeUrl(document.getElementById('fImage').value),
     link,
-    description:document.getElementById('fDesc').value.trim(),
-    featured:document.getElementById('fFeatured').checked
+    description: validateText(document.getElementById('fDesc').value, 300),
+    pinText: validateText(document.getElementById('fPinText').value, 500),
+    featured: document.getElementById('fFeatured').checked
   };
-  let products=getProducts();
-  if(prod.featured)products.forEach(p=>p.featured=false);
-  if(editId){products=products.map(p=>p.id===prod.id?prod:p)}
-  else{products.unshift(prod)}
+
+  let products = getProducts();
+  if(prod.featured) products.forEach(p=>p.featured=false);
+  if(editId){ products = products.map(p=>p.id===prod.id?prod:p); }
+  else { products.unshift(prod); }
   saveProducts(products);
   closeModal('productModal');
   renderProductsTable();
   renderDashboard();
-  showToast(editId?'✅ Product updated!':'✅ Product added!');
+  showToast(editId ? '✅ Product updated!' : '✅ Product added!');
 }
+
 function deleteProduct(id){
-  if(!confirm('Delete this product? This cannot be undone.'))return;
+  if(!confirm('Delete this product? This cannot be undone.')) return;
   saveProducts(getProducts().filter(p=>p.id!==id));
-  renderProductsTable();renderDashboard();
+  renderProductsTable(); renderDashboard();
   showToast('🗑️ Product deleted.');
 }
 
-// ═══════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════
+//  DISCOVER PRODUCTS (pre-loaded niche lists)
+// ═══════════════════════════════════════════════════════════
+const TRENDING_PRODUCTS = [
+  {name:"Apple AirPods Max (Gen 2)",category:"Electronics",price:"$529.00",originalPrice:"$549.00",rating:4.7,image:"https://images.unsplash.com/photo-1583394838336-acd977736f90?w=600&q=80",link:"https://amzn.to/airpods-max-2",description:"Premium over-ear headphones with spatial audio. $20 off at launch.",pinText:"AirPods Max Gen 2 just dropped and already discounted! Spatial audio + lossless — pure luxury for audiophiles 🎧"},
+  {name:"Nintendo Switch 2",category:"Gaming",price:"$449.99",originalPrice:"",rating:4.9,image:"https://images.unsplash.com/photo-1612287230202-1ff1d85d1bdf?w=600&q=80",link:"https://amzn.to/switch-2",description:"The next generation Nintendo Switch. Upgraded display, performance, and Pro Controller support.",pinText:"Nintendo Switch 2 is HERE and it's INCREDIBLE. This is the upgrade worth waiting for 🎮 Tap for details!"},
+  {name:"Xreal One Pro AR Glasses",category:"Electronics",price:"$448.00",originalPrice:"$599.00",rating:4.5,image:"https://images.unsplash.com/photo-1574276254982-6a84ea9f8f2a?w=600&q=80",link:"https://amzn.to/xreal-one-pro",description:"500-inch virtual screen anywhere. No cameras, privacy-safe AR for work on the go.",pinText:"A 500-inch screen in your pocket?? Xreal AR glasses are at their LOWEST EVER price 😱 Work from anywhere!"},
+  {name:"AMD Ryzen 9 9900X Processor",category:"Electronics",price:"$399.99",originalPrice:"$449.99",rating:4.8,image:"https://images.unsplash.com/photo-1591799264318-7e6ef8ddb7ea?w=600&q=80",link:"https://amzn.to/ryzen-9-9900x",description:"12-core AM5 processor. Best multi-threading for productivity and gaming.",pinText:"Build or upgrade your PC RIGHT NOW! AMD Ryzen 9 9900X at its best deal price 💻 Great for creators & gamers alike"},
+  {name:"Samsung Frame TV 55-inch (2025)",category:"Home & Living",price:"$897.99",originalPrice:"$1,199.99",rating:4.7,image:"https://images.unsplash.com/photo-1593784991095-a205069470b6?w=600&q=80",link:"https://amzn.to/samsung-frame-55",description:"Doubles as wall art when off. Most popular living room upgrade of 2026.",pinText:"Your TV can be ART! Samsung Frame TV is beautiful AND functional. This deal won't last 🖼️ Save now, buy later!"},
+  {name:"Anker Wireless Apple Charger",category:"Electronics",price:"$19.99",originalPrice:"$39.99",rating:4.6,image:"https://images.unsplash.com/photo-1586953208448-b95a79798f07?w=600&q=80",link:"https://amzn.to/anker-wireless",description:"50% off Apple-compatible wireless charger. Reviewers say it's better than the real Apple charger.",pinText:"Why pay $40 for Apple's charger when this Anker one is 50% off AND better?! 🔋 Grab it before it sells out!"},
+];
+
+const DEALS_PRODUCTS = [
+  {name:"Sony WH-1000XM5 (On Sale)",category:"Electronics",price:"$279.99",originalPrice:"$349.99",rating:4.8,image:"https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=600&q=80",link:"https://amzn.to/sony-xm5-deal",description:"Best noise-cancelling headphones at Spring Sale price. $70 discount.",pinText:"DEAL ALERT 🚨 Sony XM5 headphones are $70 off! Best noise cancellation I've ever tried. Don't sleep on this!"},
+  {name:"Apple AirTag 4-Pack",category:"Electronics",price:"$59.99",originalPrice:"$99.00",rating:4.8,image:"https://images.unsplash.com/photo-1631281956016-3cdc1b2fe5fb?w=600&q=80",link:"https://amzn.to/airtag-4pack",description:"Track bags, keys, pets. 4-pack at lowest price ever — $39 off.",pinText:"AirTag 4-pack at an ALL TIME LOW price 🏷️ Never lose your keys/bag/pet again. Perfect gift idea too!"},
+  {name:"Bose QuietComfort 45 Headphones",category:"Electronics",price:"$179.00",originalPrice:"$279.00",rating:4.7,image:"https://images.unsplash.com/photo-1546435770-a3e426bf472b?w=600&q=80",link:"https://amzn.to/bose-qc45",description:"$100 off premium Bose noise-cancelling. Best deal since Black Friday.",pinText:"$100 OFF Bose headphones right now! This NEVER happens outside of Black Friday 😤 Tap to grab it before it's gone"},
+  {name:"Fire TV Stick 4K Plus (50% Off)",category:"Electronics",price:"$24.99",originalPrice:"$49.99",rating:4.6,image:"https://images.unsplash.com/photo-1592861956120-e524fc739696?w=600&q=80",link:"https://amzn.to/fire-tv-4k-plus",description:"Stream in 4K with Dolby Vision, Atmos. Use code 4KPLUSFTV at checkout for 50% off.",pinText:"HALF PRICE! Fire TV Stick 4K is 50% off with coupon code 4KPLUSFTV 🔥 Upgrade your streaming TODAY!"},
+  {name:"Anker Charging Station Hub",category:"Electronics",price:"$29.99",originalPrice:"$39.99",rating:4.7,image:"https://images.unsplash.com/photo-1609091839311-d5365f9ff1c5?w=600&q=80",link:"https://amzn.to/anker-hub",description:"3 AC outlets, 2 USB-C, 2 USB-A ports. Compact, heavy-duty desk hub.",pinText:"End cable chaos FOREVER! This Anker hub organizes ALL your devices in one spot 🔌 On sale with Prime exclusive deal"},
+  {name:"Apple M4 MacBook Air (Base, $40 Off)",category:"Electronics",price:"$959.00",originalPrice:"$999.00",rating:4.9,image:"https://images.unsplash.com/photo-1517336714731-489689fd1ca8?w=600&q=80",link:"https://amzn.to/macbook-air-m4",description:"Brand new M4 chip, 12GB RAM — first discount ever, already $40-$80 off.",pinText:"NEW MacBook Air M4 is already discounted on Day 1! This NEVER happens. M4 chip + 12GB RAM = blazing fast 💻"},
+];
+
+function loadTrendingProducts(){ renderDiscoverResults(TRENDING_PRODUCTS,'🔥 Trending Now — April 2026'); }
+function loadDealsProducts(){ renderDiscoverResults(DEALS_PRODUCTS,'💸 Hot Deals — Amazon Spring Sale 2026'); }
+
+function discoverProducts(){
+  const q = document.getElementById('discoverQuery').value.trim().toLowerCase();
+  const cat = document.getElementById('discoverCategory').value;
+  const all = [...TRENDING_PRODUCTS, ...DEALS_PRODUCTS, ...SAMPLE_PRODUCTS];
+  const seen = new Set();
+  const results = all.filter(p=>{
+    const key = p.name;
+    if(seen.has(key)) return false;
+    seen.add(key);
+    const matchCat = !cat || p.category === cat;
+    const matchQ = !q || p.name.toLowerCase().includes(q) || p.category.toLowerCase().includes(q) || (p.description||'').toLowerCase().includes(q);
+    return matchCat && matchQ;
+  });
+  renderDiscoverResults(results, `🔍 Search results for "${document.getElementById('discoverQuery').value || 'All'}"`);
+}
+
+function renderDiscoverResults(products, title){
+  const container = document.getElementById('discoverResults');
+  if(!products.length){
+    container.innerHTML = '<div class="card"><div class="empty"><div class="empty-icon">🔍</div>No products found. Try different keywords.</div></div>';
+    document.getElementById('discoverStatus').textContent = '';
+    return;
+  }
+  document.getElementById('discoverStatus').textContent = `Found ${products.length} products`;
+  container.innerHTML = `
+    <div class="card">
+      <div class="card-title">${esc(title)}</div>
+      <div class="search-results-grid">
+        ${products.map(p=>{
+          const rawP = parseFloat((p.price||'').replace(/[^0-9.]/g,''));
+          const rawO = parseFloat((p.originalPrice||'').replace(/[^0-9.]/g,''));
+          const disc = rawO && rawP && rawO > rawP ? Math.round((1-rawP/rawO)*100) : 0;
+          return `
+          <div class="result-card" onclick="importDiscoveredProduct(${JSON.stringify(p).replace(/"/g,'&quot;')})">
+            ${p.image ? `<img class="result-img" src="${sanitizeUrl(p.image)}" alt="" loading="lazy" onerror="this.src=''"/>` : '<div class="result-img" style="background:var(--bg3);display:flex;align-items:center;justify-content:center;font-size:2rem">📦</div>'}
+            <div class="result-body">
+              <div class="result-cat">${esc(p.category)}</div>
+              <div class="result-name">${esc(p.name)}</div>
+              <div style="display:flex;align-items:center;flex-wrap:wrap;margin-top:.3rem">
+                <span class="result-price">${esc(p.price)}</span>
+                ${p.originalPrice ? `<span class="result-orig">${esc(p.originalPrice)}</span>` : ''}
+                ${disc > 0 ? `<span class="result-disc">${disc}% OFF</span>` : ''}
+              </div>
+              <button class="btn btn-sm" style="margin-top:.7rem;width:100%">+ Import to Catalog</button>
+            </div>
+          </div>`;
+        }).join('')}
+      </div>
+    </div>`;
+}
+
+function importDiscoveredProduct(p){
+  const products = getProducts();
+  // Check duplicate by name
+  if(products.find(x=>x.name.toLowerCase()===p.name.toLowerCase())){
+    showToast('⚠️ Product already in catalog.');
+    return;
+  }
+  const newProd = {
+    ...p,
+    id: Date.now(),
+    featured: false
+  };
+  products.unshift(newProd);
+  saveProducts(products);
+  renderProductsTable(); renderDashboard();
+  showToast(`✅ "${p.name}" added to catalog!`);
+}
+
+// ═══════════════════════════════════════════════════════════
 //  SNAPSHOTS
-// ═══════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════
 function saveSnapshot(){
-  const date=todayStr();
-  const key=SNAP_PFX+date;
-  const snap={date,products:getProducts(),savedAt:new Date().toISOString()};
-  lsSet(key,snap);
+  const date = todayStr();
+  const key = SNAP_PFX+date;
+  const snap = {date, products: getProducts(), savedAt: new Date().toISOString()};
+  lsSet(key, snap);
   showToast(`📸 Snapshot saved for ${fmtDate(date)}`);
-  renderSnapshots();renderDashboard();renderGeneratePage();
+  renderSnapshots(); renderDashboard(); renderGeneratePage();
 }
 
 function renderSnapshots(filter=''){
-  const keys=getSnapKeys();
-  const el=document.getElementById('snapshotsList');
-  const filtered=filter?keys.filter(k=>k.includes(filter)):keys;
+  const keys = getSnapKeys();
+  const el = document.getElementById('snapshotsList');
+  const filtered = filter ? keys.filter(k=>k.includes(filter)) : keys;
   if(!filtered.length){
-    el.innerHTML='<div class="card"><div class="empty"><div class="empty-icon">📭</div>No snapshots yet. Click "Save Today" to capture your catalog.</div></div>';
+    el.innerHTML = '<div class="card"><div class="empty"><div class="empty-icon">📭</div>No snapshots yet. Click "Save Today" to capture your catalog.</div></div>';
     return;
   }
-  el.innerHTML=filtered.map(k=>{
-    const snap=lsGet(k)||{};
-    const date=k.replace(SNAP_PFX,'');
-    const count=snap.products?snap.products.length:0;
+  el.innerHTML = filtered.map(k=>{
+    const snap = lsGet(k)||{};
+    const date = k.replace(SNAP_PFX,'');
+    const count = snap.products ? snap.products.length : 0;
     return `<div class="card" style="margin-bottom:.8rem">
       <div class="flex items-center justify-between wrap gap">
         <div>
           <div class="snap-date">📅 ${fmtDate(date)}</div>
-          <div class="snap-meta">${count} products · Saved ${snap.savedAt?new Date(snap.savedAt).toLocaleString():''}</div>
+          <div class="snap-meta">${count} products · Saved ${snap.savedAt ? new Date(snap.savedAt).toLocaleString() : ''}</div>
         </div>
         <div class="flex gap-sm wrap">
-          <button class="btn btn-sm" onclick="generateFromKey('${k}')">⚡ Preview & Download</button>
-          <button class="btn-danger btn-sm" onclick="deleteSnapshot('${k}')">Delete</button>
+          <button class="btn btn-sm" onclick="generateFromKey('${esc(k)}')">⚡ Preview & Download</button>
+          <button class="btn-danger" onclick="deleteSnapshot('${esc(k)}')" style="font-size:.8rem;padding:.42rem .9rem">Delete</button>
         </div>
       </div>
     </div>`;
@@ -699,109 +1024,160 @@ function renderSnapshots(filter=''){
 }
 
 function deleteSnapshot(key){
-  if(!confirm('Delete this snapshot?'))return;
-  lsDel(key);showToast('🗑️ Snapshot deleted.');
-  renderSnapshots();renderDashboard();renderGeneratePage();
+  if(!confirm('Delete this snapshot?')) return;
+  lsDel(key);
+  showToast('🗑️ Snapshot deleted.');
+  renderSnapshots(); renderDashboard(); renderGeneratePage();
 }
 
-// ═══════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════
 //  DASHBOARD
-// ═══════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════
 function renderDashboard(){
-  const prods=getProducts();
-  const snapKeys=getSnapKeys();
-  const cats=new Set(prods.map(p=>p.category));
-  const stats=[
+  const prods = getProducts();
+  const snapKeys = getSnapKeys();
+  const cats = new Set(prods.map(p=>p.category));
+  const withPins = prods.filter(p=>p.pinText&&p.pinText.trim()).length;
+  const stats = [
     {icon:'⊞',val:prods.length,label:'Total Products'},
     {icon:'🏷',val:cats.size,label:'Categories'},
     {icon:'📅',val:snapKeys.length,label:'Snapshots'},
-    {icon:'⭐',val:prods.filter(p=>p.featured).length,label:'Featured'},
+    {icon:'📌',val:withPins,label:'Pins Ready'},
   ];
-  document.getElementById('statGrid').innerHTML=stats.map(s=>`
+  document.getElementById('statGrid').innerHTML = stats.map(s=>`
     <div class="stat-card">
       <div class="stat-icon">${s.icon}</div>
       <div class="stat-val">${s.val}</div>
       <div class="stat-label">${s.label}</div>
     </div>`).join('');
 
-  const dashSnaps=document.getElementById('dashSnaps');
-  if(!snapKeys.length){dashSnaps.innerHTML='<div class="empty"><div class="empty-icon">📭</div>No snapshots yet.</div>';return}
-  dashSnaps.innerHTML=snapKeys.slice(0,5).map(k=>{
-    const date=k.replace(SNAP_PFX,'');
+  const dashSnaps = document.getElementById('dashSnaps');
+  if(!snapKeys.length){
+    dashSnaps.innerHTML='<div class="empty"><div class="empty-icon">📭</div>No snapshots yet.</div>';
+    return;
+  }
+  dashSnaps.innerHTML = snapKeys.slice(0,5).map(k=>{
+    const date = k.replace(SNAP_PFX,'');
     return `<div class="snap-item">
       <span>📅 ${fmtDate(date)}</span>
-      <button class="btn btn-sm" onclick="generateFromKey('${k}')">⚡ Generate</button>
+      <button class="btn btn-sm" onclick="generateFromKey('${esc(k)}')">⚡ Generate</button>
     </div>`;
   }).join('');
 }
 
-// ═══════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════
 //  GENERATE PAGE
-// ═══════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════
 function renderGeneratePage(){
-  const prods=getProducts();
-  document.getElementById('liveGenDesc').textContent=
+  const prods = getProducts();
+  document.getElementById('liveGenDesc').textContent =
     `Current catalog: ${prods.length} products — generates today's page (${fmtDate(todayStr())}).`;
-  const keys=getSnapKeys();
-  const el=document.getElementById('generateSnaps');
-  if(!keys.length){el.innerHTML='<div style="color:var(--dim)">No snapshots yet. Save one from the Snapshots tab.</div>';return}
-  el.innerHTML=keys.map(k=>{
-    const date=k.replace(SNAP_PFX,'');
-    const snap=lsGet(k)||{};
-    const count=snap.products?snap.products.length:0;
+  const keys = getSnapKeys();
+  const el = document.getElementById('generateSnaps');
+  if(!keys.length){
+    el.innerHTML='<div style="color:var(--dim)">No snapshots yet. Save one from the Snapshots tab.</div>';
+    return;
+  }
+  el.innerHTML = keys.map(k=>{
+    const date = k.replace(SNAP_PFX,'');
+    const snap = lsGet(k)||{};
+    const count = snap.products ? snap.products.length : 0;
     return `<div class="snap-item">
       <div><span style="font-weight:500">📅 ${fmtDate(date)}</span><span style="color:var(--muted);font-size:.8rem;margin-left:.6rem">${count} products</span></div>
-      <button class="btn btn-sm" onclick="generateFromKey('${k}')">⚡ Generate</button>
+      <button class="btn btn-sm" onclick="generateFromKey('${esc(k)}')">⚡ Generate</button>
     </div>`;
   }).join('');
 }
 
 function generateLive(){
-  const snap={date:todayStr(),products:getProducts()};
+  const snap = {date: todayStr(), products: getProducts()};
   showPreview(snap);
 }
 function generateFromKey(key){
-  const snap=lsGet(key);
+  const snap = lsGet(key);
   if(!snap){showToast('⚠️ Snapshot not found.');return}
   showPreview(snap);
 }
 
-// ═══════════════════════════════════════════════
-//  HTML GENERATOR
-// ═══════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════
+//  INDEX.HTML GENERATOR — Secure, structured template
+// ═══════════════════════════════════════════════════════════
 function generateHTML(snap){
-  const {date,products}=snap;
-  const cats=[...new Set(products.map(p=>p.category))].sort();
+  const {date, products} = snap;
+  const cats = [...new Set(products.map(p=>p.category))].sort();
 
-  function cardHTML(p){
-    const rawPrice=parseFloat((p.price||'').replace(/[^0-9.]/g,''));
-    const rawOrig=parseFloat((p.originalPrice||'').replace(/[^0-9.]/g,''));
-    const disc=rawOrig&&rawPrice&&rawOrig>rawPrice?Math.round((1-rawPrice/rawOrig)*100):0;
-    const r=p.rating||4;const f=Math.floor(r);const h=r%1>=0.5;
-    const st='★'.repeat(f)+(h?'½':'')+'☆'.repeat(5-f-(h?1:0));
-    return `<div class="cw" data-cat="${(p.category||'').replace(/"/g,'&quot;')}">
-      ${disc>4?`<span class="badge">${disc}% OFF</span>`:''}
+  function e(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
+  function safeUrl(u){ const url=String(u||'').trim(); return /^https?:\/\//i.test(url)?url.replace(/[<>"']/g,''):'#'; }
+  function disc(price, orig){
+    const p=parseFloat((price||'').replace(/[^0-9.]/g,'')),o=parseFloat((orig||'').replace(/[^0-9.]/g,''));
+    return o&&p&&o>p?Math.round((1-p/o)*100):0;
+  }
+  function starsStr(r){ const f=Math.floor(r),h=r%1>=0.5; return '★'.repeat(f)+(h?'½':'')+'☆'.repeat(5-f-(h?1:0)); }
+
+  const cardsHtml = products.map(p=>{
+    const d = disc(p.price, p.originalPrice);
+    return `
+    <div class="cw" data-cat="${e(p.category)}">
+      ${d>4?`<span class="badge">${d}% OFF</span>`:''}
       <div class="pc">
-        ${p.image?`<img class="ci" src="${p.image}" alt="${(p.name||'').replace(/"/g,'&quot;')}" loading="lazy" onerror="this.style.display='none'"/>`:'<div class="ci-ph">📦</div>'}
+        ${p.image&&safeUrl(p.image)!=='#'
+          ? `<img class="ci" src="${safeUrl(p.image)}" alt="${e(p.name)}" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"/><div class="ci-ph" style="display:none">📦</div>`
+          : `<div class="ci-ph">📦</div>`}
         <div class="cb">
-          <div class="cc">${p.category||''}</div>
-          <div class="cn">${p.name||''}</div>
-          ${p.description?`<div class="cd">${p.description}</div>`:''}
-          <div class="cr"><span class="st">${st}</span><span class="rn">${r.toFixed(1)}</span></div>
+          <div class="cc">${e(p.category)}</div>
+          <div class="cn">${e(p.name)}</div>
+          ${p.description?`<div class="cd">${e(p.description)}</div>`:''}
+          <div class="cr"><span class="st">${starsStr(p.rating||4)}</span><span class="rn">${(p.rating||4).toFixed(1)}</span></div>
           <div class="cf">
-            <div class="cp"><span class="pn">${p.price||''}</span>${p.originalPrice?`<span class="po">${p.originalPrice}</span>`:''}</div>
-            <a href="${p.link||'#'}" target="_blank" rel="noopener noreferrer sponsored" class="ca">Get Deal</a>
+            <div class="cp">
+              <span class="pn">${e(p.price)}</span>
+              ${p.originalPrice?`<span class="po">${e(p.originalPrice)}</span>`:''}
+            </div>
+            <a href="${safeUrl(p.link)}" target="_blank" rel="noopener noreferrer sponsored" class="ca">Get Deal →</a>
           </div>
         </div>
       </div>
     </div>`;
-  }
+  }).join('');
+
+  const featuredProd = products.find(p=>p.featured)||products[0]||null;
+  const featuredHtml = featuredProd ? (() => {
+    const d = disc(featuredProd.price, featuredProd.originalPrice);
+    return `
+  <section class="featured-strip" id="featured">
+    <div class="featured-inner">
+      <div class="featured-text">
+        <div class="sl light">⭐ Editor's Pick</div>
+        <h2>Our Most Loved Product This Week</h2>
+        <p>${e(featuredProd.description||'')}</p>
+        <a href="${safeUrl(featuredProd.link)}" class="cta light" target="_blank" rel="noopener noreferrer sponsored">Get This Deal →</a>
+      </div>
+      <div class="featured-card">
+        <div style="position:relative">
+          ${d>4?`<span class="badge">${d}% OFF</span>`:''}
+          ${featuredProd.image&&safeUrl(featuredProd.image)!=='#'
+            ? `<img class="ci" src="${safeUrl(featuredProd.image)}" alt="${e(featuredProd.name)}" style="height:220px;border-radius:12px 12px 0 0"/>`
+            : `<div class="ci-ph" style="height:220px;border-radius:12px 12px 0 0">📦</div>`}
+        </div>
+        <div class="cb">
+          <div class="cc">${e(featuredProd.category)}</div>
+          <div class="cn" style="font-size:1.1rem">${e(featuredProd.name)}</div>
+          <div class="cr"><span class="st">${starsStr(featuredProd.rating||4)}</span><span class="rn">${(featuredProd.rating||4).toFixed(1)}</span></div>
+          <div class="cf"><div class="cp"><span class="pn">${e(featuredProd.price)}</span>${featuredProd.originalPrice?`<span class="po">${e(featuredProd.originalPrice)}</span>`:''}</div></div>
+        </div>
+      </div>
+    </div>
+  </section>`;
+  })() : '';
 
   return `<!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-<title>DeliveryZone — ${fmtDate(date)}</title>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<meta name="description" content="DeliveryZone — Curated Amazon affiliate deals on tech, education, home and more. Updated ${fmtDate(date)}."/>
+<meta http-equiv="X-Content-Type-Options" content="nosniff"/>
+<title>DeliveryZone — ${e(fmtDate(date))}</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
@@ -809,182 +1185,566 @@ function generateHTML(snap){
 :root{--a:#F59E0B;--ad:#D97706;--bg:#0D1B2A;--bg2:#112236;--sf:#1A2F44;--tx:#F0F6FF;--mu:#8BA4BC;--br:rgba(245,158,11,.13)}
 body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--tx);min-height:100vh}
 ::-webkit-scrollbar{width:5px}::-webkit-scrollbar-thumb{background:var(--ad);border-radius:4px}
-nav{position:sticky;top:0;z-index:100;background:rgba(13,27,42,.9);backdrop-filter:blur(14px);border-bottom:1px solid var(--br)}
+a{text-decoration:none;color:inherit}
+nav{position:sticky;top:0;z-index:100;background:rgba(13,27,42,.92);backdrop-filter:blur(14px);border-bottom:1px solid var(--br)}
 .ni{max-width:1280px;margin:0 auto;padding:0 2rem;height:64px;display:flex;align-items:center;gap:1.5rem}
-.logo{font-family:'Syne',sans-serif;font-weight:800;font-size:1.4rem;color:var(--tx);text-decoration:none}
+.logo{font-family:'Syne',sans-serif;font-weight:800;font-size:1.4rem;color:var(--tx)}
 .logo span{color:var(--a)}
 .ns{flex:1;max-width:360px;margin-left:auto;position:relative}
 .ns input{width:100%;background:var(--sf);border:1px solid var(--br);color:var(--tx);padding:.5rem 1rem .5rem 2.3rem;border-radius:999px;font-size:.88rem;font-family:inherit;outline:none}
 .ns input:focus{border-color:var(--a)}
 .ns svg{position:absolute;left:.7rem;top:50%;transform:translateY(-50%);color:var(--mu);pointer-events:none}
-.dbadge{background:rgba(245,158,11,.12);border:1px solid rgba(245,158,11,.25);color:var(--a);font-size:.73rem;font-weight:600;padding:.22rem .7rem;border-radius:999px}
+.dbadge{background:rgba(245,158,11,.12);border:1px solid rgba(245,158,11,.25);color:var(--a);font-size:.73rem;font-weight:600;padding:.22rem .7rem;border-radius:999px;white-space:nowrap}
+.nav-links{display:flex;gap:1.5rem}
+.nav-links a{color:var(--mu);font-size:.88rem;font-weight:500;transition:color .2s}
+.nav-links a:hover{color:var(--tx)}
 .hero{max-width:1280px;margin:0 auto;padding:5rem 2rem 3rem;position:relative;overflow:hidden}
 .htag{display:inline-flex;background:rgba(245,158,11,.1);border:1px solid rgba(245,158,11,.3);color:var(--a);font-size:.75rem;font-weight:600;padding:.25rem .75rem;border-radius:999px;letter-spacing:.05em;margin-bottom:1.4rem}
 .hero h1{font-family:'Syne',sans-serif;font-size:clamp(2.8rem,6vw,5.5rem);font-weight:800;line-height:1.0;letter-spacing:-.03em;margin-bottom:1rem}
 .hero h1 em{font-style:normal;color:var(--a)}
 .hero p{color:var(--mu);font-size:1rem;max-width:400px;line-height:1.7;margin-bottom:1.8rem}
-.cta{display:inline-flex;align-items:center;gap:.4rem;background:var(--a);color:#000;font-family:'Syne',sans-serif;font-weight:700;font-size:.88rem;padding:.75rem 1.7rem;border-radius:999px;text-decoration:none;box-shadow:0 4px 18px rgba(245,158,11,.3);transition:background .2s}
+.cta{display:inline-flex;align-items:center;gap:.4rem;background:var(--a);color:#000;font-family:'Syne',sans-serif;font-weight:700;font-size:.88rem;padding:.75rem 1.7rem;border-radius:999px;transition:background .2s}
 .cta:hover{background:var(--ad)}
+.cta.light{background:transparent;color:var(--a);border:2px solid var(--a)}
+.cta.light:hover{background:var(--a);color:#000}
 .glow{position:absolute;top:-80px;right:-120px;width:450px;height:450px;background:radial-gradient(circle,rgba(245,158,11,.07) 0%,transparent 65%);pointer-events:none}
+.hero-stats{display:flex;align-items:center;gap:2rem;margin-top:2.5rem}
+.stat strong{font-family:'Syne',sans-serif;font-weight:800;font-size:2rem;color:var(--a);display:block}
+.stat span{color:var(--mu);font-size:.82rem}
+.stat-div{width:1px;height:40px;background:var(--br)}
 .section{max-width:1280px;margin:0 auto;padding:2.5rem 2rem}
 .sl{font-size:.72rem;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--a);margin-bottom:1.2rem}
+.sl.light{color:rgba(245,158,11,.7)}
 .cats{display:flex;flex-wrap:wrap;gap:.5rem;margin-bottom:2rem}
-.cb2{background:var(--sf);color:var(--mu);border:1px solid var(--br);padding:.38rem .95rem;border-radius:999px;font-size:.82rem;font-family:inherit;cursor:pointer;transition:all .2s}
-.cb2:hover,.cb2.active{background:var(--a);color:#000;border-color:var(--a)}
+.cb{padding:.38rem .95rem;border-radius:999px;font-size:.82rem;font-family:inherit;cursor:pointer;transition:all .2s;border:1px solid var(--br);background:var(--sf);color:var(--mu)}
+.cb:hover,.cb.active{background:var(--a);color:#000;border-color:var(--a)}
 .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(265px,1fr));gap:1.2rem}
 .cw{position:relative}.cw.off{display:none}
-.pc{background:var(--sf);border:1px solid var(--br);border-radius:14px;overflow:hidden;transition:transform .25s,box-shadow .25s,border-color .25s;height:100%}
+.pc{background:var(--sf);border:1px solid var(--br);border-radius:14px;overflow:hidden;transition:transform .25s,box-shadow .25s,border-color .25s;height:100%;display:flex;flex-direction:column}
 .pc:hover{transform:translateY(-5px);box-shadow:0 0 28px rgba(245,158,11,.18);border-color:rgba(245,158,11,.3)}
-.ci{width:100%;height:185px;object-fit:cover;display:block}
-.ci-ph{width:100%;height:185px;background:linear-gradient(135deg,#162e45,#1f3a52);display:flex;align-items:center;justify-content:center;font-size:2.5rem}
-.cb{padding:1rem;display:flex;flex-direction:column;gap:.42rem}
+.ci{width:100%;height:185px;object-fit:cover;display:block;flex-shrink:0}
+.ci-ph{width:100%;height:185px;background:linear-gradient(135deg,#162e45,#1f3a52);display:flex;align-items:center;justify-content:center;font-size:2.5rem;flex-shrink:0}
+.cb{padding:1rem;display:flex;flex-direction:column;gap:.42rem;flex:1}
 .cc{font-size:.68rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--a)}
 .cn{font-family:'Syne',sans-serif;font-size:.98rem;font-weight:700;line-height:1.3}
-.cd{font-size:.82rem;color:var(--mu);line-height:1.55}
+.cd{font-size:.82rem;color:var(--mu);line-height:1.55;flex:1}
 .cr{display:flex;align-items:center;gap:.3rem}.st{color:var(--a)}.rn{color:var(--mu);font-size:.76rem}
 .cf{display:flex;align-items:center;justify-content:space-between;gap:.5rem;margin-top:.3rem}
 .cp{display:flex;align-items:baseline;gap:.35rem}
 .pn{font-family:'Syne',sans-serif;font-weight:800;font-size:1.15rem;color:var(--a)}
 .po{font-size:.78rem;color:#4a6580;text-decoration:line-through}
-.ca{background:var(--a);color:#000;font-family:'Syne',sans-serif;font-weight:700;font-size:.76rem;padding:.46rem .95rem;border-radius:999px;text-decoration:none;flex-shrink:0;transition:background .2s}
+.ca{background:var(--a);color:#000;font-family:'Syne',sans-serif;font-weight:700;font-size:.76rem;padding:.46rem .95rem;border-radius:999px;flex-shrink:0;transition:background .2s}
 .ca:hover{background:var(--ad)}
 .badge{position:absolute;top:.65rem;left:.65rem;background:var(--a);color:#000;font-size:.66rem;font-weight:800;letter-spacing:.05em;text-transform:uppercase;padding:.2rem .52rem;border-radius:6px;z-index:1}
-.no-results{text-align:center;padding:3rem;color:var(--mu);font-size:1rem}
-footer{background:var(--bg);border-top:1px solid var(--br);padding:2rem;margin-top:3rem;text-align:center;color:#4a6580;font-size:.8rem;line-height:1.9}
-@media(max-width:640px){.hero h1{font-size:2.6rem}.ni{padding:0 1rem}.section{padding:1.5rem 1rem}}
+.empty-state{text-align:center;padding:4rem 2rem;color:var(--mu)}
+.empty-icon{font-size:3rem;margin-bottom:.8rem}
+.featured-strip{background:linear-gradient(135deg,#0f2235,#162d44);border-top:1px solid var(--br);border-bottom:1px solid var(--br);padding:4rem 2rem;margin:2rem 0}
+.featured-inner{max-width:1280px;margin:0 auto;display:grid;grid-template-columns:1fr 320px;gap:4rem;align-items:center}
+.featured-text h2{font-family:'Syne',sans-serif;font-weight:800;font-size:clamp(1.8rem,4vw,2.8rem);line-height:1.15;margin-bottom:1rem}
+.featured-text p{color:var(--mu);line-height:1.7;margin-bottom:1.8rem;max-width:380px}
+.featured-card{background:var(--sf);border:1px solid var(--br);border-radius:14px;overflow:hidden}
+.disclosure{max-width:1280px;margin:0 auto;padding:1rem 2rem;font-size:.78rem;color:var(--mu);border-top:1px solid var(--br)}
+footer{background:var(--bg);border-top:1px solid var(--br);padding:3rem 2rem;text-align:center;color:var(--mu)}
+footer .footer-inner{max-width:1280px;margin:0 auto;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:1.5rem}
+.footer-brand .logo{font-size:1.3rem}
+.footer-brand p{color:var(--mu);font-size:.85rem;margin-top:.3rem}
+.footer-note{font-size:.8rem;color:var(--mu);text-align:right;line-height:1.8}
+@media(max-width:960px){.featured-inner{grid-template-columns:1fr}}
+@media(max-width:640px){.hero h1{font-size:2.6rem}.ni{padding:0 1rem}.section{padding:1.5rem 1rem}.nav-links{display:none}.hero-stats{gap:1rem}}
 </style>
 </head>
 <body>
-<nav><div class="ni">
-  <a href="#" class="logo">Delivery<span>Zone</span></a>
-  <div class="ns">
-    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-    <input type="text" id="si" placeholder="Search products…"/>
+
+<nav>
+  <div class="ni">
+    <a href="#" class="logo">Delivery<span>Zone</span></a>
+    <div class="ns">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <input type="text" id="si" placeholder="Search products…" autocomplete="off"/>
+    </div>
+    <div class="nav-links">
+      <a href="#products">Products</a>
+      <a href="#featured">Featured</a>
+    </div>
+    <span class="dbadge">📅 ${e(fmtDate(date))}</span>
   </div>
-  <span class="dbadge">📅 ${fmtDate(date)}</span>
-</div></nav>
+</nav>
 
 <section class="hero">
-  <div class="htag">✦ ${fmtDate(date)} Edition</div>
+  <div class="htag">✦ ${e(fmtDate(date))} Edition</div>
   <h1>Discover<br/><em>Premium</em><br/>Products</h1>
-  <p>Curated deals — click, compare, and save.</p>
+  <p>Curated Amazon affiliate deals — click, compare, and save.</p>
   <a href="#products" class="cta">Explore ${products.length} Deals →</a>
+  <div class="hero-stats">
+    <div class="stat"><strong>${products.length}</strong><span>Products</span></div>
+    <div class="stat-div"></div>
+    <div class="stat"><strong>100%</strong><span>Verified</span></div>
+    <div class="stat-div"></div>
+    <div class="stat"><strong>24/7</strong><span>Updated</span></div>
+  </div>
   <div class="glow"></div>
 </section>
 
 <section class="section" id="products">
   <div class="sl">Browse by Category</div>
-  <div class="cats">
-    <button class="cb2 active" data-cat="all">All (${products.length})</button>
-    ${cats.map(c=>`<button class="cb2" data-cat="${c.replace(/"/g,'&quot;')}">${c}</button>`).join('')}
+  <div class="cats" id="catFilters">
+    <button class="cb active" data-cat="all">All (${products.length})</button>
+    ${cats.map(c=>`<button class="cb" data-cat="${e(c)}">${e(c)}</button>`).join('')}
   </div>
-  <div class="grid" id="grid">${products.map(cardHTML).join('')}</div>
-  <div class="no-results hidden" id="noRes">No products match your search.</div>
+  <div class="grid" id="grid">${cardsHtml}</div>
+  <div class="empty-state" id="noRes" style="display:none">
+    <div class="empty-icon">🔍</div>
+    <p>No products match your search or filter.</p>
+  </div>
 </section>
 
+${featuredHtml}
+
+<div class="disclosure">
+  <strong>Affiliate Disclosure:</strong> This site contains affiliate links. We may earn a commission when you purchase through these links, at no extra cost to you. Edition: ${e(fmtDate(date))}
+</div>
+
 <footer>
-  <strong style="color:var(--tx);font-family:'Syne',sans-serif;font-size:1rem">DeliveryZone</strong><br/>
-  This site contains affiliate links. We may earn a commission at no extra cost to you.<br/>
-  Edition: ${fmtDate(date)} &nbsp;·&nbsp; © ${new Date().getFullYear()} DeliveryZone
+  <div class="footer-inner">
+    <div class="footer-brand">
+      <a href="#" class="logo">Delivery<span>Zone</span></a>
+      <p>Curated affiliate deals, updated daily.</p>
+    </div>
+    <div class="footer-note">
+      This site contains affiliate links. We may earn a commission.<br/>
+      © ${new Date().getFullYear()} DeliveryZone. All rights reserved.
+    </div>
+  </div>
 </footer>
 
 <script>
-var cards=document.querySelectorAll('.cw'),catBtns=document.querySelectorAll('.cb2'),si=document.getElementById('si'),noRes=document.getElementById('noRes');
-var activeCat='all',searchQ='';
-function filter(){
-  var shown=0;
-  cards.forEach(function(c){
-    var mc=activeCat==='all'||c.dataset.cat===activeCat;
-    var ms=!searchQ||c.innerText.toLowerCase().includes(searchQ);
-    c.classList.toggle('off',!(mc&&ms));
-    if(mc&&ms)shown++;
+(function(){
+  var cards=Array.from(document.querySelectorAll('.cw'));
+  var catBtns=Array.from(document.querySelectorAll('.cb'));
+  var si=document.getElementById('si');
+  var noRes=document.getElementById('noRes');
+  var activeCat='all';
+  var searchQ='';
+
+  function filter(){
+    var shown=0;
+    cards.forEach(function(c){
+      var mc=activeCat==='all'||c.dataset.cat===activeCat;
+      var ms=!searchQ||c.innerText.toLowerCase().includes(searchQ);
+      var show=mc&&ms;
+      c.classList.toggle('off',!show);
+      if(show)shown++;
+    });
+    noRes.style.display=shown===0?'block':'none';
+  }
+
+  catBtns.forEach(function(b){
+    b.addEventListener('click',function(){
+      catBtns.forEach(function(x){x.classList.remove('active')});
+      b.classList.add('active');
+      activeCat=b.dataset.cat;
+      filter();
+    });
   });
-  noRes.classList.toggle('hidden',shown>0);
-}
-catBtns.forEach(function(b){b.addEventListener('click',function(){catBtns.forEach(function(x){x.classList.remove('active')});b.classList.add('active');activeCat=b.dataset.cat;filter()})});
-si.addEventListener('input',function(){searchQ=si.value.toLowerCase();filter()});
+
+  si.addEventListener('input',function(){
+    searchQ=si.value.toLowerCase().trim();
+    filter();
+  });
+})();
 <\/script>
 </body>
 </html>`;
 }
 
 function showPreview(snap){
-  const html=generateHTML(snap);
-  currentPreviewHTML=html;
-  currentPreviewDate=snap.date;
-  document.getElementById('previewTitle').textContent=`🖥 Preview — ${fmtDate(snap.date)}`;
-  document.getElementById('previewFrame').srcdoc=html;
+  const html = generateHTML(snap);
+  currentPreviewHTML = html;
+  currentPreviewDate = snap.date;
+  document.getElementById('previewTitle').textContent = `🖥 Preview — ${fmtDate(snap.date)}`;
+  document.getElementById('previewFrame').srcdoc = html;
   openModal('previewModal');
 }
+
 function downloadCurrentPreview(){
-  const blob=new Blob([currentPreviewHTML],{type:'text/html'});
-  const a=document.createElement('a');
-  a.href=URL.createObjectURL(blob);
-  a.download=`deliveryzone-${currentPreviewDate}.html`;
+  const blob = new Blob([currentPreviewHTML], {type:'text/html'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `index.html`;
   a.click();
-  showToast('✅ HTML file downloaded!');
+  URL.revokeObjectURL(a.href);
+  showToast('✅ index.html downloaded!');
 }
 
-// ═══════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════
+//  PINTEREST PIN GENERATOR
+// ═══════════════════════════════════════════════════════════
+function getPinConfig(){
+  return lsGet(PIN_CFG_KEY) || {
+    siteName:'DeliveryZone',
+    siteUrl:'',
+    affiliateTag:'',
+    boardName:'Best Amazon Deals 2026',
+    hashtags:'#AmazonDeals, #AffiliateMarketing, #BestDeals, #TechDeals, #ShoppingTips',
+    siteDesc:'Curated Amazon affiliate deals on tech, education, home & more. Updated daily.'
+  };
+}
+
+function loadPinSettings(){
+  const cfg = getPinConfig();
+  document.getElementById('pinSiteName').value = cfg.siteName||'';
+  document.getElementById('pinSiteUrl').value = cfg.siteUrl||'';
+  document.getElementById('pinAffiliateTag').value = cfg.affiliateTag||'';
+  document.getElementById('pinBoardName').value = cfg.boardName||'';
+  document.getElementById('pinHashtags').value = cfg.hashtags||'';
+  document.getElementById('pinSiteDesc').value = cfg.siteDesc||'';
+}
+
+function savePinSettings(){
+  const cfg = {
+    siteName: document.getElementById('pinSiteName').value.trim(),
+    siteUrl: document.getElementById('pinSiteUrl').value.trim(),
+    affiliateTag: document.getElementById('pinAffiliateTag').value.trim(),
+    boardName: document.getElementById('pinBoardName').value.trim(),
+    hashtags: document.getElementById('pinHashtags').value.trim(),
+    siteDesc: document.getElementById('pinSiteDesc').value.trim(),
+  };
+  lsSet(PIN_CFG_KEY, cfg);
+  showToast('✅ Pin settings saved!');
+}
+
+function buildPinEssentials(p, cfg){
+  const hashtags = cfg.hashtags || '#AmazonDeals #BestDeals';
+  const boardName = cfg.boardName || 'Amazon Deals';
+  const disc = (() => {
+    const pv=parseFloat((p.price||'').replace(/[^0-9.]/g,'')),ov=parseFloat((p.originalPrice||'').replace(/[^0-9.]/g,''));
+    return ov&&pv&&ov>pv?Math.round((1-pv/ov)*100):0;
+  })();
+
+  return `📌 PIN ESSENTIALS — ${p.name}
+${'─'.repeat(50)}
+📝 Pin Title (100 chars):
+${(p.name + (disc>0?' — '+disc+'% OFF':'')).slice(0,100)}
+
+📋 Pin Description (500 chars):
+${(p.pinText||p.description||'Check out this amazing product!')} ${disc>0?`Save ${disc}% right now! `:''} ${hashtags}
+
+🔗 Destination URL:
+${p.link||cfg.siteUrl||'https://yoursite.com'}
+
+🖼 Image URL (use product image or custom pin graphic):
+${p.image||'[Add your 1000x1500px pin image URL here]'}
+
+📋 Board:
+${boardName}
+
+#️⃣ Hashtags (copy-paste):
+${hashtags}
+
+✅ Alt Text (accessibility):
+${p.name} — ${p.category}${disc>0?' — '+disc+'% Off':''}
+
+🛒 Affiliate Tag:
+${cfg.affiliateTag||'[your-tag-20]'}
+${'─'.repeat(50)}`;
+}
+
+function switchPinTab(name, btn){
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('pinTab-'+name).classList.add('active');
+}
+
+function renderIndividualPinsPreview(){
+  const products = getProducts();
+  const container = document.getElementById('individualPinsContainer');
+  if(!products.length){
+    container.innerHTML = '<div class="empty"><div class="empty-icon">📦</div>No products in catalog yet.</div>';
+    return;
+  }
+  container.innerHTML = products.map(p=>{
+    const hasPinText = p.pinText && p.pinText.trim();
+    return `<div class="pin-card">
+      <div class="pin-card-header">
+        <div>
+          <div class="pin-card-title">${esc(p.name)}</div>
+          <div style="color:var(--muted);font-size:.78rem">${esc(p.category)} · ${esc(p.price)}</div>
+        </div>
+        <div class="flex gap-sm">
+          ${hasPinText?'<span class="badge badge-green">✓ Pin text</span>':'<span class="badge badge-gray">No pin text</span>'}
+          <button class="btn-pink btn-sm" onclick="openPinModal(${p.id})">📌 View Pin</button>
+        </div>
+      </div>
+      ${hasPinText
+        ? `<div style="background:var(--bg3);border-radius:8px;padding:.8rem;font-size:.85rem;color:var(--muted);line-height:1.5">${esc(p.pinText)}</div>`
+        : `<div style="color:var(--dim);font-size:.82rem">No pin text added. <button class="btn-ghost" style="font-size:.78rem;padding:.25rem .6rem" onclick="openEditModal(${p.id})">+ Add pin text</button></div>`
+      }
+    </div>`;
+  }).join('');
+}
+
+function generateAllIndividualPins(){
+  const products = getProducts();
+  const container = document.getElementById('individualPinsContainer');
+  const cfg = getPinConfig();
+  if(!products.length){
+    container.innerHTML = '<div class="empty"><div class="empty-icon">📦</div>No products yet.</div>';
+    return;
+  }
+  container.innerHTML = products.map(p=>{
+    const essentials = buildPinEssentials(p, cfg);
+    return `<div class="pin-card">
+      <div class="pin-card-header">
+        <div>
+          <div class="pin-card-title">${esc(p.name)}</div>
+          <div style="color:var(--muted);font-size:.78rem">${esc(p.category)} · ${esc(p.price)}</div>
+        </div>
+        <button class="btn-copy" onclick="copyText(this,'${esc(essentials).replace(/'/g,'&#39;').replace(/\n/g,'\\n')}')">Copy</button>
+      </div>
+      <div class="pin-essentials-header">
+        <span class="pin-essentials-label">Pin Essentials</span>
+      </div>
+      <pre class="pin-essentials">${esc(essentials)}</pre>
+    </div>`;
+  }).join('');
+  showToast(`📌 Generated ${products.length} individual pins!`);
+}
+
+function openPinModal(id){
+  const p = getProducts().find(x=>x.id===id);
+  if(!p) return;
+  const cfg = getPinConfig();
+  const essentials = buildPinEssentials(p, cfg);
+  document.getElementById('pinModalTitle').textContent = `📌 Pin — ${p.name}`;
+
+  const disc = (() => {
+    const pv=parseFloat((p.price||'').replace(/[^0-9.]/g,'')),ov=parseFloat((p.originalPrice||'').replace(/[^0-9.]/g,''));
+    return ov&&pv&&ov>pv?Math.round((1-pv/ov)*100):0;
+  })();
+
+  document.getElementById('pinModalBody').innerHTML = `
+    <div class="alert alert-pink" style="margin-bottom:1.2rem">
+      📌 Save this pin's essentials — copy and paste directly into Pinterest!
+    </div>
+
+    <div class="form-grid" style="margin-bottom:1.2rem">
+      <div>
+        ${p.image ? `<img src="${sanitizeUrl(p.image)}" style="width:100%;border-radius:10px;max-height:200px;object-fit:cover" alt="${esc(p.name)}" onerror="this.style.display='none'"/>` : '<div style="height:160px;background:var(--bg3);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:3rem">📦</div>'}
+        <div style="margin-top:.8rem">
+          <strong style="font-size:.95rem">${esc(p.name)}</strong><br/>
+          <span style="color:var(--accent);font-family:Syne,sans-serif;font-weight:700">${esc(p.price)}</span>
+          ${p.originalPrice ? `<span style="color:var(--dim);text-decoration:line-through;font-size:.8rem;margin-left:.4rem">${esc(p.originalPrice)}</span>` : ''}
+          ${disc > 0 ? `<span style="background:var(--accent);color:#000;font-size:.65rem;font-weight:800;padding:.1rem .4rem;border-radius:4px;margin-left:.4rem">${disc}% OFF</span>` : ''}
+        </div>
+      </div>
+      <div>
+        <div class="pin-field">
+          <label>Pin Text (editable)</label>
+          <textarea id="pinTextEdit" rows="5" style="font-size:.85rem" maxlength="500">${esc(p.pinText||p.description||'')}</textarea>
+          <div class="char-count" id="pinTextEditCount">${(p.pinText||p.description||'').length} / 500</div>
+        </div>
+        <button class="btn btn-sm" onclick="savePinText(${p.id})" style="margin-bottom:.5rem">💾 Save Pin Text</button>
+      </div>
+    </div>
+
+    <div class="pin-essentials-header" style="margin-bottom:.5rem">
+      <span class="pin-essentials-label">📋 Pin Essentials (copy all)</span>
+      <button class="btn-copy" onclick="copyPinEssentials('pinEssentialsBox')">Copy All</button>
+    </div>
+    <pre class="pin-essentials" id="pinEssentialsBox">${esc(essentials)}</pre>
+  `;
+
+  const ta = document.getElementById('pinTextEdit');
+  const cnt = document.getElementById('pinTextEditCount');
+  ta.addEventListener('input', ()=>{ cnt.textContent = ta.value.length+' / 500'; });
+  openModal('pinModal');
+}
+
+function savePinText(id){
+  const newText = validateText(document.getElementById('pinTextEdit').value, 500);
+  let products = getProducts();
+  products = products.map(p=>p.id===id ? {...p, pinText:newText} : p);
+  saveProducts(products);
+  showToast('✅ Pin text saved!');
+}
+
+function copyPinEssentials(elId){
+  const el = document.getElementById(elId);
+  if(!el) return;
+  copyText(null, el.textContent);
+}
+
+function copyText(btn, text){
+  const decoded = text.replace(/\\n/g,'\n').replace(/&amp;/g,'&').replace(/&lt;/g,'<').replace(/&gt;/g,'>').replace(/&quot;/g,'"').replace(/&#39;/g,"'");
+  navigator.clipboard.writeText(decoded).then(()=>{
+    showToast('✅ Copied to clipboard!');
+    if(btn){ btn.textContent='✓ Copied'; setTimeout(()=>btn.textContent='Copy',2000); }
+  }).catch(()=>{
+    // Fallback
+    const ta = document.createElement('textarea');
+    ta.value = decoded; ta.style.position='fixed'; ta.style.opacity='0';
+    document.body.appendChild(ta); ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+    showToast('✅ Copied!');
+  });
+}
+
+function generateCombinedPin(){
+  const products = getProducts();
+  const cfg = getPinConfig();
+  const container = document.getElementById('combinedPinContainer');
+  if(!products.length){
+    container.innerHTML='<div class="alert alert-error">No products in catalog.</div>';
+    return;
+  }
+
+  const cats = [...new Set(products.map(p=>p.category))];
+  const featured = products.find(p=>p.featured)||products[0];
+  const topDeals = products.filter(p=>{
+    const pv=parseFloat((p.price||'').replace(/[^0-9.]/g,'')),ov=parseFloat((p.originalPrice||'').replace(/[^0-9.]/g,''));
+    return ov&&pv&&ov>pv;
+  }).slice(0,3).map(p=>p.name);
+
+  const combinedText = `🛒 ${products.length} CURATED DEALS — ${cfg.siteName||'DeliveryZone'}
+
+${cfg.siteDesc||'The best Amazon affiliate deals, updated daily.'}
+
+✨ Today's Top Picks:
+${products.slice(0,5).map((p,i)=>`${['1️⃣','2️⃣','3️⃣','4️⃣','5️⃣'][i]} ${p.name} — ${p.price}`).join('\n')}
+
+🏷 Categories: ${cats.join(' · ')}
+${topDeals.length?`\n💸 Hot Deals: ${topDeals.join(', ')}`:'' }
+
+${cfg.hashtags||'#AmazonDeals #BestDeals #AffiliateMarketing'}`;
+
+  const essentials = `📌 COMBINED SITE PIN ESSENTIALS
+${'─'.repeat(55)}
+📝 Pin Title:
+${cfg.siteName||'DeliveryZone'} — ${products.length} Curated Amazon Deals
+
+📋 Pin Description:
+${combinedText}
+
+🔗 Destination URL:
+${cfg.siteUrl||'https://yoursite.com'}
+
+🖼 Image Suggestion:
+Create a collage of your top 4-6 product images (1000x1500px)
+Or use a branded graphic with your site name + headline
+
+📋 Board:
+${cfg.boardName||'Best Amazon Deals 2026'}
+
+#️⃣ Hashtags:
+${cfg.hashtags||'#AmazonDeals #BestDeals'}
+${'─'.repeat(55)}`;
+
+  container.innerHTML = `<div class="card">
+    <div class="card-title">🌐 Combined Site Pin</div>
+    <div class="alert alert-pink" style="margin-bottom:1rem">
+      Use this pin whenever you publish a new page snapshot. Great for showcasing your full catalog!
+    </div>
+    <div class="pin-essentials-header" style="margin-bottom:.5rem">
+      <span class="pin-essentials-label">📋 Combined Pin Essentials</span>
+      <button class="btn-copy" onclick="copyText(this,'${esc(essentials).replace(/\n/g,'\\n').replace(/'/g,'&#39;')}')">Copy All</button>
+    </div>
+    <pre class="pin-essentials">${esc(essentials)}</pre>
+  </div>`;
+  showToast('✅ Combined pin generated!');
+}
+
+// ═══════════════════════════════════════════════════════════
 //  MODAL HELPERS
-// ═══════════════════════════════════════════════
-function openModal(id){document.getElementById(id).classList.add('open')}
-function closeModal(id){document.getElementById(id).classList.remove('open')}
+// ═══════════════════════════════════════════════════════════
+function openModal(id){ document.getElementById(id).classList.add('open'); }
+function closeModal(id){ document.getElementById(id).classList.remove('open'); }
 document.querySelectorAll('.overlay').forEach(el=>{
-  el.addEventListener('click',e=>{if(e.target===el)el.classList.remove('open')})
+  el.addEventListener('click', e=>{ if(e.target===el) el.classList.remove('open'); });
 });
 
-// ═══════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════
 //  PASSWORD CHANGE
-// ═══════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════
 async function changePassword(){
-  const p1=document.getElementById('newPw1').value;
-  const p2=document.getElementById('newPw2').value;
-  const el=document.getElementById('pwAlert');
-  if(!p1||p1.length<8){el.innerHTML='<div class="alert alert-error">Password must be at least 8 characters.</div>';return}
-  if(p1!==p2){el.innerHTML='<div class="alert alert-error">Passwords do not match.</div>';return}
-  const hash=await sha256(p1);
-  lsSet(PW_KEY,hash);
+  const p1 = document.getElementById('newPw1').value;
+  const p2 = document.getElementById('newPw2').value;
+  const el = document.getElementById('pwAlert');
+  if(!p1 || p1.length < MIN_PW_LEN){
+    el.innerHTML=`<div class="alert alert-error">Password must be at least ${MIN_PW_LEN} characters.</div>`; return;
+  }
+  if(p1 !== p2){
+    el.innerHTML='<div class="alert alert-error">Passwords do not match.</div>'; return;
+  }
+  const hash = await sha256(p1);
+  lsSet(PW_KEY, hash);
   el.innerHTML='<div class="alert alert-success">✅ Password updated successfully!</div>';
   document.getElementById('newPw1').value='';
   document.getElementById('newPw2').value='';
-  setTimeout(()=>{el.innerHTML=''},4000);
+  setTimeout(()=>{ el.innerHTML=''; }, 4000);
 }
 
-// ═══════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════
 //  EXPORT / IMPORT
-// ═══════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════
 function exportData(){
-  const snapKeys=getSnapKeys();
-  const snapshots={};
-  snapKeys.forEach(k=>{snapshots[k]=lsGet(k)});
-  const data={exportedAt:new Date().toISOString(),products:getProducts(),snapshots};
-  const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
-  const a=document.createElement('a');a.href=URL.createObjectURL(blob);
-  a.download='deliveryzone-export.json';a.click();
+  const snapKeys = getSnapKeys();
+  const snapshots = {};
+  snapKeys.forEach(k=>{ snapshots[k]=lsGet(k); });
+  const data = {
+    exportedAt: new Date().toISOString(),
+    version: '2.0',
+    products: getProducts(),
+    snapshots,
+    pinConfig: getPinConfig()
+  };
+  const blob = new Blob([JSON.stringify(data,null,2)], {type:'application/json'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `deliveryzone-export-${todayStr()}.json`;
+  a.click();
+  URL.revokeObjectURL(a.href);
   showToast('✅ Data exported!');
 }
-function importData(){document.getElementById('importFile').click()}
+
+function importData(){ document.getElementById('importFile').click(); }
+
 function handleImport(input){
-  const file=input.files[0];if(!file)return;
-  const reader=new FileReader();
-  reader.onload=function(e){
+  const file = input.files[0];
+  if(!file) return;
+  if(!file.name.endsWith('.json')){
+    showToast('⚠️ Please select a valid .json file.'); return;
+  }
+  const reader = new FileReader();
+  reader.onload = function(e){
     try{
-      const data=JSON.parse(e.target.result);
-      if(data.products)lsSet(PRODS_KEY,data.products);
-      if(data.snapshots){Object.entries(data.snapshots).forEach(([k,v])=>lsSet(k,v))}
-      renderDashboard();renderProductsTable();renderSnapshots();renderGeneratePage();
+      const data = JSON.parse(e.target.result);
+      if(Array.isArray(data.products)) lsSet(PRODS_KEY, data.products);
+      if(data.snapshots) Object.entries(data.snapshots).forEach(([k,v])=>lsSet(k,v));
+      if(data.pinConfig) lsSet(PIN_CFG_KEY, data.pinConfig);
+      renderDashboard(); renderProductsTable(); renderSnapshots(); renderGeneratePage(); loadPinSettings();
       showToast('✅ Data imported successfully!');
-    }catch{showToast('⚠️ Invalid JSON file.')}
+    }catch(err){
+      showToast('⚠️ Invalid JSON file: '+err.message);
+    }
   };
   reader.readAsText(file);
   input.value='';
 }
+
 function deleteAllSnapshots(){
-  if(!confirm('Delete ALL snapshots? This cannot be undone.'))return;
+  if(!confirm('Delete ALL snapshots? This cannot be undone.')) return;
   getSnapKeys().forEach(k=>lsDel(k));
   showToast('🗑️ All snapshots deleted.');
-  renderSnapshots();renderDashboard();renderGeneratePage();
+  renderSnapshots(); renderDashboard(); renderGeneratePage();
+}
+
+function resetToSamples(){
+  if(!confirm('Reset to sample products? This will overwrite your current catalog.')) return;
+  lsSet(PRODS_KEY, SAMPLE_PRODUCTS);
+  renderProductsTable(); renderDashboard();
+  showToast('↩ Reset to sample products.');
 }
 </script>
 </body>
