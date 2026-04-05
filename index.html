@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>DeliveryZone — Curated Products, Best Deals</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- NAV -->
+  <header class="nav-wrap">
+    <nav class="nav">
+      <a href="#" class="logo">Delivery<span>Zone</span></a>
+      <div class="nav-search">
+        <input type="text" id="searchInput" placeholder="Search products…" autocomplete="off"/>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      </div>
+      <div class="nav-links">
+        <a href="#products">Products</a>
+        <a href="#categories">Categories</a>
+        <a href="#featured">Featured</a>
+      </div>
+    </nav>
+  </header>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-badge">✦ Handpicked for you</div>
+    <h1 class="hero-title">Discover<br/><em>Premium</em><br/>Products</h1>
+    <p class="hero-sub">Curated deals from top brands — all in one place. Click, compare, and save.</p>
+    <a href="#products" class="cta-btn">Explore Deals <span>→</span></a>
+    <div class="hero-stats">
+      <div class="stat"><strong id="productCount">0</strong><span>Products</span></div>
+      <div class="stat-div"></div>
+      <div class="stat"><strong>100%</strong><span>Verified</span></div>
+      <div class="stat-div"></div>
+      <div class="stat"><strong>24/7</strong><span>Updated</span></div>
+    </div>
+    <div class="hero-glow"></div>
+  </section>
+
+  <!-- CATEGORIES -->
+  <section class="section" id="categories">
+    <div class="section-label">Browse by Category</div>
+    <div class="categories" id="categoryFilters">
+      <button class="cat-btn active" data-cat="all">All</button>
+    </div>
+  </section>
+
+  <!-- PRODUCTS GRID -->
+  <section class="section" id="products">
+    <div class="section-label">All Products</div>
+    <div class="products-grid" id="productsGrid"></div>
+    <div class="empty-state" id="emptyState" style="display:none">
+      <div class="empty-icon">🔍</div>
+      <p>No products found. Try a different search or category.</p>
+    </div>
+  </section>
+
+  <!-- FEATURED -->
+  <section class="featured-strip" id="featured">
+    <div class="featured-inner">
+      <div class="featured-text">
+        <div class="section-label light">Editor's Pick</div>
+        <h2>Our Most Loved<br/>Product This Week</h2>
+        <p id="featuredDesc">Loading…</p>
+        <a id="featuredLink" href="#" class="cta-btn light" target="_blank" rel="noopener noreferrer">Get This Deal →</a>
+      </div>
+      <div class="featured-card" id="featuredCard"></div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <div class="footer-inner">
+      <div class="footer-brand">
+        <a href="#" class="logo">Delivery<span>Zone</span></a>
+        <p>Curated affiliate deals, updated daily.</p>
+      </div>
+      <div class="footer-note">
+        <p>This site contains affiliate links. We may earn a commission at no extra cost to you.</p>
+        <p>© 2025 DeliveryZone. All rights reserved.</p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ADD PRODUCT MODAL (Admin) -->
+  <div class="fab-wrap">
+    <button class="fab" id="openModal" title="Add Product">+</button>
+  </div>
+
+  <div class="modal-overlay" id="modalOverlay">
+    <div class="modal">
+      <div class="modal-header">
+        <h3>Add New Product</h3>
+        <button class="modal-close" id="closeModal">✕</button>
+      </div>
+      <div class="modal-body">
+        <label>Product Name *<input type="text" id="pName" placeholder="e.g. Sony WH-1000XM5"/></label>
+        <label>Category *<input type="text" id="pCategory" placeholder="e.g. Electronics, Fashion…"/></label>
+        <label>Price *<input type="text" id="pPrice" placeholder="e.g. $199.99"/></label>
+        <label>Original Price<input type="text" id="pOriginal" placeholder="e.g. $349.99 (optional)"/></label>
+        <label>Rating (1–5)<input type="number" id="pRating" min="1" max="5" step="0.1" placeholder="4.5"/></label>
+        <label>Image URL *<input type="text" id="pImage" placeholder="https://…"/></label>
+        <label>Affiliate Link *<input type="text" id="pLink" placeholder="https://amzn.to/…"/></label>
+        <label>Short Description<textarea id="pDesc" placeholder="Why you'll love this product…"></textarea></label>
+        <label class="checkbox-label"><input type="checkbox" id="pFeatured"/> Mark as Featured</label>
+        <button class="submit-btn" id="submitProduct">Add Product</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
