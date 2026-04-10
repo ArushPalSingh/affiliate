@@ -7,7 +7,8 @@
 <meta http-equiv="X-Frame-Options" content="DENY"/>
 <title>DeliveryZone Admin</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
@@ -209,6 +210,69 @@ tr:hover td{background:rgba(255,255,255,.02)}
   .nav-btn{width:auto;font-size:.78rem;padding:.45rem .7rem}
   main{padding:1rem}
 }
+
+/* ═══════════════════════════════════════════
+   IMAGE HARVEST TOOL STYLES
+═══════════════════════════════════════════ */
+#page-imageharvest{font-family:'DM Mono',monospace}
+.ih-tabs{display:flex;gap:4px;margin-bottom:0;border-bottom:1px solid var(--border);padding-bottom:0;flex-wrap:wrap}
+.ih-tab{background:none;border:1px solid var(--border);border-bottom:none;color:var(--muted);font-family:'DM Mono',monospace;font-size:.75rem;letter-spacing:.06em;padding:8px 16px;border-radius:8px 8px 0 0;cursor:pointer;transition:all .15s;text-transform:uppercase}
+.ih-tab:hover{color:var(--text)}
+.ih-tab.active{background:var(--surface2);color:var(--accent);border-bottom-color:var(--surface2)}
+.ih-panel{display:none;padding:1.4rem 0 0}
+.ih-panel.active{display:block}
+.ih-search-group{display:flex;gap:8px;margin-bottom:14px}
+.ih-search-wrap{flex:1;position:relative}
+.ih-search-icon{position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--muted);pointer-events:none;font-size:.95rem}
+.ih-search-input{width:100%;background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px 12px 12px 38px;font-family:'DM Mono',monospace;font-size:.83rem;color:var(--text);outline:none;transition:border-color .2s}
+.ih-search-input:focus{border-color:var(--accent)}
+.ih-search-input::placeholder{color:var(--muted)}
+.ih-chips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px}
+.ih-chip{background:var(--bg3);border:1px solid var(--border);border-radius:20px;padding:3px 11px;font-family:'DM Mono',monospace;font-size:.68rem;color:var(--muted);cursor:pointer;transition:all .15s}
+.ih-chip:hover{border-color:var(--accent);color:var(--accent)}
+.ih-options-row{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px;align-items:center}
+.ih-options-row label{font-size:.7rem;color:var(--muted);text-transform:uppercase;letter-spacing:.08em}
+.ih-status-bar{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:8px 14px;font-family:'DM Mono',monospace;font-size:.73rem;color:var(--muted);margin-bottom:14px;min-height:36px;display:flex;align-items:center;gap:8px}
+.ih-dot{width:7px;height:7px;border-radius:50%;background:var(--muted);flex-shrink:0}
+.ih-dot.active{background:var(--accent);animation:spin .8s linear infinite}
+.ih-dot.done{background:#22c55e}
+.ih-dot.error{background:#ef4444}
+.ih-progress-wrap{background:var(--bg3);border-radius:4px;height:3px;overflow:hidden;margin-bottom:14px;display:none}
+.ih-progress-bar{height:100%;background:linear-gradient(90deg,var(--accent),#86efac);border-radius:4px;transition:width .3s ease;width:0%}
+.ih-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:10px;margin-bottom:1rem}
+.ih-img-card{background:var(--bg2);border:1px solid var(--border);border-radius:10px;overflow:hidden;cursor:pointer;transition:all .18s;position:relative}
+.ih-img-card:hover{border-color:var(--accent);transform:translateY(-2px)}
+.ih-img-card.selected{border-color:#86efac}
+.ih-img-card.selected::after{content:'✓';position:absolute;top:5px;right:5px;background:#22c55e;color:#000;width:18px;height:18px;border-radius:50%;font-size:.65rem;font-weight:bold;display:grid;place-items:center}
+.ih-img-card img{width:100%;aspect-ratio:1;object-fit:cover;display:block}
+.ih-img-ph{width:100%;aspect-ratio:1;background:var(--bg3);display:none;place-items:center;color:var(--muted);font-size:1.4rem}
+.ih-img-label{padding:5px 7px;font-family:'DM Mono',monospace;font-size:.62rem;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ih-action-bar{display:flex;gap:8px;flex-wrap:wrap;padding:12px 0;border-top:1px solid var(--border);position:sticky;bottom:0;background:var(--bg)}
+.ih-count-badge{background:var(--accent);color:#000;border-radius:20px;padding:3px 10px;font-size:.68rem;font-weight:700;align-self:center;font-family:'DM Mono',monospace}
+.ih-cred-note{font-size:.68rem;color:var(--accent);margin-top:6px;line-height:1.6}
+/* Pinterest enhancer */
+.ih-upload-zone{border:2px dashed var(--border);border-radius:var(--radius-sm);padding:32px 16px;text-align:center;cursor:pointer;transition:all .2s;margin-bottom:16px}
+.ih-upload-zone:hover,.ih-upload-zone.dragover{border-color:var(--accent);background:var(--accent-l)}
+.ih-upload-zone .ih-icon{font-size:2.2rem;margin-bottom:8px}
+.ih-upload-zone p{color:var(--muted);font-size:.78rem}
+.ih-upload-zone strong{color:var(--accent)}
+.ih-canvas-wrap{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-sm);overflow:hidden;margin-bottom:12px;text-align:center;display:none}
+#ihPreviewCanvas{max-width:100%;display:block;margin:0 auto;max-height:300px}
+.ih-enhance-controls{display:none;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px}
+.ih-ctrl-group label{display:block;font-family:'DM Mono',monospace;font-size:.68rem;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:5px}
+.ih-ctrl-group input[type=range]{width:100%;accent-color:var(--accent);cursor:pointer}
+.ih-ctrl-group select{font-family:'DM Mono',monospace;font-size:.78rem}
+.ih-val{font-size:.72rem;color:var(--accent);float:right;font-family:'DM Mono',monospace}
+.ih-img-nav{display:none;align-items:center;gap:8px;margin-bottom:10px}
+.ih-pin-actions{display:none;gap:8px;flex-wrap:wrap;margin-top:6px}
+.ih-empty{text-align:center;padding:50px 16px;color:var(--muted);grid-column:1/-1}
+.ih-empty .ih-e-icon{font-size:2.5rem;margin-bottom:12px;opacity:.4}
+.ih-empty p{font-size:.78rem;line-height:1.7}
+@media(max-width:600px){
+  .ih-search-group{flex-direction:column}
+  .ih-enhance-controls{grid-template-columns:1fr}
+  .ih-grid{grid-template-columns:repeat(auto-fill,minmax(100px,1fr));gap:7px}
+}
 </style>
 </head>
 <body>
@@ -248,6 +312,7 @@ tr:hover td{background:rgba(255,255,255,.02)}
     <button class="nav-btn" data-page="discover" onclick="navTo('discover',this)">🔍 &nbsp;Discover Products</button>
     <div class="nav-section">Pinterest</div>
     <button class="nav-btn" data-page="pins" onclick="navTo('pins',this)">📌 &nbsp;Pin Generator</button>
+    <button class="nav-btn" data-page="imageharvest" onclick="navTo('imageharvest',this)">🖼 &nbsp;Image Harvest</button>
     <div class="nav-section">Publish</div>
     <button class="nav-btn" data-page="snapshots" onclick="navTo('snapshots',this)">📅 &nbsp;Snapshots</button>
     <button class="nav-btn" data-page="generate" onclick="navTo('generate',this)">⚡ &nbsp;Generate Page</button>
@@ -271,6 +336,7 @@ tr:hover td{background:rgba(255,255,255,.02)}
           <button class="btn btn-sm" onclick="saveSnapshot()">📸 Save Snapshot</button>
           <button class="btn-outline btn-sm" onclick="navTo('generate',document.querySelector('[data-page=generate]'))">⚡ Generate Page</button>
           <button class="btn-pink btn-sm" onclick="navTo('pins',document.querySelector('[data-page=pins]'))">📌 Pinterest Pins</button>
+          <button class="btn-ghost btn-sm" onclick="navTo('imageharvest',document.querySelector('[data-page=imageharvest]'))">🖼 Image Harvest</button>
           <button class="btn-outline btn-sm" onclick="navTo('discover',document.querySelector('[data-page=discover]'))">🔍 Discover</button>
         </div>
       </div>
@@ -477,8 +543,178 @@ tr:hover td{background:rgba(255,255,255,.02)}
       </div>
     </section>
 
+    <!-- IMAGE HARVEST -->
+    <section class="page" id="page-imageharvest">
+      <div class="page-title">🖼 Image Harvest</div>
+      <div class="page-sub">Search &amp; download Amazon product images · Boost them to Pinterest hi-def (1000×1500)</div>
+
+      <!-- Credential bar -->
+      <div class="card" style="padding:.9rem 1.2rem;margin-bottom:1rem">
+        <div class="flex items-center justify-between wrap gap">
+          <span style="font-family:'DM Mono',monospace;font-size:.75rem;color:var(--muted)">⚙ Amazon session credentials (optional — unlocks more product images)</span>
+          <button class="btn-ghost btn-sm" onclick="ihOpenCreds()">Edit Credentials</button>
+        </div>
+        <div id="ihCredStatus" class="ih-cred-note">No credentials set — using public image search.</div>
+      </div>
+
+      <!-- Tabs -->
+      <div class="ih-tabs">
+        <button class="ih-tab active" onclick="ihSwitchTab('search',this)">🔍 Search &amp; Grab</button>
+        <button class="ih-tab" onclick="ihSwitchTab('pinterest',this)">📌 Pinterest Boost</button>
+      </div>
+
+      <!-- ── PANEL: SEARCH ── -->
+      <div class="ih-panel active" id="ihPanel-search">
+        <div class="ih-search-group">
+          <div class="ih-search-wrap">
+            <span class="ih-search-icon">🛍</span>
+            <input type="text" class="ih-search-input" id="ihSearchInput" placeholder="e.g. wireless earbuds, yoga mat, desk lamp…" onkeydown="if(event.key==='Enter')ihDoSearch()">
+          </div>
+          <button class="btn btn-sm" onclick="ihDoSearch()" id="ihSearchBtn" style="border-radius:var(--radius-sm)">Search</button>
+        </div>
+
+        <div class="ih-chips">
+          <span class="ih-chip" onclick="ihQuickSearch(this)">Wireless Earbuds</span>
+          <span class="ih-chip" onclick="ihQuickSearch(this)">Yoga Mat</span>
+          <span class="ih-chip" onclick="ihQuickSearch(this)">Desk Lamp</span>
+          <span class="ih-chip" onclick="ihQuickSearch(this)">Water Bottle</span>
+          <span class="ih-chip" onclick="ihQuickSearch(this)">Phone Stand</span>
+          <span class="ih-chip" onclick="ihQuickSearch(this)">Skincare</span>
+          <span class="ih-chip" onclick="ihQuickSearch(this)">Notebook</span>
+        </div>
+
+        <div class="ih-options-row">
+          <label>Source:</label>
+          <select id="ihSource" style="font-size:.78rem;padding:6px 10px">
+            <option value="ddg">DuckDuckGo (Amazon results)</option>
+            <option value="pixabay">Pixabay product images</option>
+            <option value="both">Both (merge)</option>
+          </select>
+          <label>Max:</label>
+          <select id="ihMax" style="font-size:.78rem;padding:6px 10px">
+            <option value="12">12</option>
+            <option value="24" selected>24</option>
+            <option value="48">48</option>
+          </select>
+        </div>
+
+        <div class="ih-status-bar">
+          <div class="ih-dot" id="ihDot"></div>
+          <span id="ihStatusText">Ready — enter a product search above.</span>
+        </div>
+        <div class="ih-progress-wrap" id="ihProgressWrap">
+          <div class="ih-progress-bar" id="ihProgressBar"></div>
+        </div>
+
+        <div class="ih-grid" id="ihGrid">
+          <div class="ih-empty">
+            <div class="ih-e-icon">🛒</div>
+            <p>Search for a product above.<br>Images will appear here for selection &amp; download.</p>
+          </div>
+        </div>
+
+        <div class="ih-action-bar" id="ihActionBar" style="display:none">
+          <button class="btn-ghost btn-sm" onclick="ihSelectAll()">Select All</button>
+          <button class="btn-ghost btn-sm" onclick="ihSelectNone()">Clear</button>
+          <span class="ih-count-badge" id="ihSelCount">0 selected</span>
+          <button class="btn btn-sm" onclick="ihDownloadZip()" id="ihDlBtn" style="border-radius:var(--radius-sm)">⬇ ZIP Download</button>
+          <button class="btn-pink btn-sm" onclick="ihSendToBoost()" id="ihBoostBtn">📌 Pinterest Boost</button>
+        </div>
+      </div>
+
+      <!-- ── PANEL: PINTEREST ── -->
+      <div class="ih-panel" id="ihPanel-pinterest">
+        <div class="ih-upload-zone" id="ihDropZone" onclick="document.getElementById('ihFileInput').click()">
+          <div class="ih-icon">🖼</div>
+          <p>Tap to upload image(s) &nbsp;|&nbsp; <strong>drag &amp; drop</strong></p>
+          <p style="margin-top:6px;font-size:.68rem">Outputs Pinterest-optimised 1000×1500 px (2:3 ratio) hi-def JPEGs</p>
+        </div>
+        <input type="file" id="ihFileInput" accept="image/*" multiple onchange="ihLoadFiles(event)">
+
+        <div class="ih-canvas-wrap" id="ihCanvasWrap">
+          <canvas id="ihPreviewCanvas"></canvas>
+        </div>
+
+        <div class="ih-img-nav" id="ihImgNav">
+          <button class="btn-ghost btn-sm" onclick="ihPrevImg()">◀ Prev</button>
+          <span id="ihNavLabel" style="font-family:'DM Mono',monospace;font-size:.72rem;color:var(--muted);flex:1;text-align:center"></span>
+          <button class="btn-ghost btn-sm" onclick="ihNextImg()">Next ▶</button>
+        </div>
+
+        <div class="ih-enhance-controls" id="ihEnhanceControls">
+          <div class="ih-ctrl-group">
+            <label>Sharpness <span class="ih-val" id="ihSharpVal">5</span></label>
+            <input type="range" id="ihSharpness" min="0" max="10" value="5" oninput="ihUpdateVal('ihSharpVal',this.value);ihApplyEnhance()">
+          </div>
+          <div class="ih-ctrl-group">
+            <label>Brightness <span class="ih-val" id="ihBrightVal">0</span></label>
+            <input type="range" id="ihBrightness" min="-80" max="80" value="0" oninput="ihUpdateVal('ihBrightVal',this.value);ihApplyEnhance()">
+          </div>
+          <div class="ih-ctrl-group">
+            <label>Contrast <span class="ih-val" id="ihContrastVal">0</span></label>
+            <input type="range" id="ihContrast" min="-80" max="80" value="0" oninput="ihUpdateVal('ihContrastVal',this.value);ihApplyEnhance()">
+          </div>
+          <div class="ih-ctrl-group">
+            <label>Saturation <span class="ih-val" id="ihSatVal">0</span></label>
+            <input type="range" id="ihSaturation" min="-100" max="100" value="0" oninput="ihUpdateVal('ihSatVal',this.value);ihApplyEnhance()">
+          </div>
+          <div class="ih-ctrl-group">
+            <label>Fit Mode</label>
+            <select id="ihScaleMode" onchange="ihApplyEnhance()" style="width:100%">
+              <option value="cover">Cover (crop to 2:3)</option>
+              <option value="contain">Contain (letterbox)</option>
+              <option value="stretch">Stretch to fill</option>
+            </select>
+          </div>
+          <div class="ih-ctrl-group">
+            <label>BG Fill Color</label>
+            <input type="color" id="ihBgColor" value="#ffffff" onchange="ihApplyEnhance()"
+              style="width:100%;height:34px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--bg2);cursor:pointer">
+          </div>
+        </div>
+
+        <div class="ih-pin-actions" id="ihPinActions">
+          <button class="btn btn-sm" onclick="ihDownloadPin()" style="border-radius:var(--radius-sm)">⬇ Save This Image</button>
+          <button class="btn btn-sm" onclick="ihDownloadAllPins()" style="border-radius:var(--radius-sm)">⬇ Save All Enhanced</button>
+          <button class="btn-ghost btn-sm" onclick="ihResetEnhancer()">🔄 Reset</button>
+        </div>
+      </div>
+    </section>
+
   </main>
 </div>
+
+<!-- IH CREDENTIAL MODAL -->
+<div class="overlay" id="ihCredModal">
+  <div class="modal" style="max-width:440px">
+    <div class="modal-header">
+      <h3>Amazon Credentials</h3>
+      <button class="modal-close" onclick="closeModal('ihCredModal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <p style="color:var(--muted);font-size:.8rem;margin-bottom:1rem;line-height:1.7">
+        Optional — your Amazon session cookie lets the scraper access more product images.
+        Stored only in browser memory, never persisted or sent anywhere except Amazon.
+      </p>
+      <label class="field" style="margin-bottom:1rem">Amazon Email
+        <input type="text" id="ihCredEmail" placeholder="your@email.com">
+      </label>
+      <label class="field" style="margin-bottom:1rem">session-id cookie value
+        <input type="text" id="ihCredSession" placeholder="Paste value from Amazon cookies">
+      </label>
+      <div class="alert alert-info" style="font-size:.75rem;margin-bottom:1rem">
+        💡 Open Amazon.com → F12 → Application → Cookies → copy <strong>session-id</strong>
+      </div>
+      <div class="flex gap">
+        <button class="btn btn-sm" onclick="ihSaveCreds()">Save</button>
+        <button class="btn-outline btn-sm" onclick="closeModal('ihCredModal')">Cancel</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- IH Offscreen canvas for hi-res export -->
+<canvas id="ihOffscreen" style="display:none"></canvas>
 
 <!-- TOAST -->
 <div id="toast"></div>
@@ -1799,6 +2035,468 @@ function resetToSamples(){
   renderProductsTable(); renderDashboard();
   showToast('↩ Reset to sample products.');
 }
+
+// ═══════════════════════════════════════════════════════════
+//  IMAGE HARVEST — State
+// ═══════════════════════════════════════════════════════════
+let ihImages      = [];      // collected from search
+let ihSelected    = new Set();
+let ihPinImages   = [];      // loaded for pinterest boost
+let ihPinIndex    = 0;
+let ihCredentials = {};
+const IH_PIN_W    = 1000;
+const IH_PIN_H    = 1500;
+
+// ── Tab switching (IH-specific, uses ih-tab classes) ──
+function ihSwitchTab(name, el) {
+  document.querySelectorAll('.ih-tab').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.ih-panel').forEach(p => p.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('ihPanel-' + name).classList.add('active');
+}
+
+// ── Credentials ──
+function ihOpenCreds() { openModal('ihCredModal'); }
+function ihSaveCreds() {
+  ihCredentials = {
+    email:   document.getElementById('ihCredEmail').value.trim(),
+    session: document.getElementById('ihCredSession').value.trim()
+  };
+  document.getElementById('ihCredStatus').textContent =
+    ihCredentials.email ? `Credentials set for: ${ihCredentials.email}` : 'No credentials set — using public image search.';
+  closeModal('ihCredModal');
+  showToast('✅ Amazon credentials saved for this session.');
+}
+
+// ── Quick chip search ──
+function ihQuickSearch(el) {
+  document.getElementById('ihSearchInput').value = el.textContent.trim();
+  ihDoSearch();
+}
+
+// ── Main Search ──
+async function ihDoSearch() {
+  const query = document.getElementById('ihSearchInput').value.trim();
+  if (!query) { showToast('⚠️ Enter a search term first.'); return; }
+
+  const max    = parseInt(document.getElementById('ihMax').value);
+  const source = document.getElementById('ihSource').value;
+
+  ihSetStatus('active', `Searching for "${query}"…`);
+  ihSetProgress(0); ihShowProgress(true);
+  document.getElementById('ihSearchBtn').disabled = true;
+  document.getElementById('ihGrid').innerHTML = '';
+  document.getElementById('ihActionBar').style.display = 'none';
+  ihImages = []; ihSelected.clear();
+
+  try {
+    let imgs = [];
+    if (source === 'ddg' || source === 'both') {
+      try { imgs = imgs.concat(await ihFetchDDG(query, max)); } catch(e) { console.warn('DDG:', e.message); }
+    }
+    if (source === 'pixabay' || source === 'both') {
+      try { imgs = imgs.concat(await ihFetchPixabay(query, max)); } catch(e) { console.warn('Pixabay:', e.message); }
+    }
+
+    // Deduplicate
+    const seen = new Set();
+    imgs = imgs.filter(i => { if (seen.has(i.url)) return false; seen.add(i.url); return true; }).slice(0, max);
+
+    if (!imgs.length) {
+      imgs = ihPlaceholders(query, Math.min(max, 8));
+      showToast('⚠️ Live search limited — showing placeholders.');
+    }
+
+    ihImages = imgs;
+    ihRenderGrid(imgs);
+    ihSetStatus('done', `Found ${imgs.length} images for "${query}"`);
+    document.getElementById('ihActionBar').style.display = 'flex';
+    ihUpdateCount();
+  } catch(e) {
+    ihSetStatus('error', 'Error: ' + e.message);
+    showToast('⚠️ Search failed: ' + e.message);
+  } finally {
+    ihSetProgress(100);
+    setTimeout(() => ihShowProgress(false), 800);
+    document.getElementById('ihSearchBtn').disabled = false;
+  }
+}
+
+async function ihFetchDDG(query, max) {
+  const proxy = 'https://api.allorigins.win/get?url=';
+  const initUrl = 'https://duckduckgo.com/?q=' + encodeURIComponent(query + ' amazon product') + '&ia=images';
+  const initRes = await fetch(proxy + encodeURIComponent(initUrl), { signal: AbortSignal.timeout(10000) });
+  const initData = await initRes.json();
+  const match = (initData.contents || '').match(/vqd=['"]([^'"]+)['"]/);
+  if (!match) throw new Error('DDG token not found');
+
+  const imgUrl = 'https://duckduckgo.com/i.js?l=us-en&o=json&q=' +
+    encodeURIComponent(query + ' amazon product') + '&vqd=' + match[1] + '&f=,,,,,&p=1';
+  const imgRes  = await fetch(proxy + encodeURIComponent(imgUrl), { signal: AbortSignal.timeout(12000) });
+  const imgData = await imgRes.json();
+  const parsed  = JSON.parse(imgData.contents || '{}');
+
+  return (parsed.results || []).slice(0, max).map((r, i) => ({
+    url: r.image, thumb: r.thumbnail || r.image,
+    title: r.title || query + ' ' + (i + 1),
+    source: r.url || ''
+  }));
+}
+
+async function ihFetchPixabay(query, max) {
+  const key = '48018073-0abc7b12e96e3c0d40e1e3a4e';
+  const url = `https://pixabay.com/api/?key=${key}&q=${encodeURIComponent(query)}&image_type=photo&per_page=${max}&safesearch=true`;
+  const res  = await fetch(url, { signal: AbortSignal.timeout(10000) });
+  if (!res.ok) throw new Error('Pixabay HTTP ' + res.status);
+  const data = await res.json();
+  if (!data.hits || !data.hits.length) throw new Error('No Pixabay results');
+  return data.hits.slice(0, max).map((h, i) => ({
+    url: h.largeImageURL || h.webformatURL,
+    thumb: h.previewURL  || h.webformatURL,
+    title: (h.tags || query + ' ' + (i + 1)).split(',')[0].trim(),
+    source: h.pageURL || ''
+  }));
+}
+
+function ihPlaceholders(query, count) {
+  const colors = ['F59E0B','86efac','c084fc','f87171','60a5fa','34d399','fb923c','a78bfa'];
+  return Array.from({ length: count }, (_, i) => ({
+    url:   `https://placehold.co/800x800/${colors[i%colors.length]}/0D1B2A?text=${encodeURIComponent(query+' '+(i+1))}`,
+    thumb: `https://placehold.co/200x200/${colors[i%colors.length]}/0D1B2A?text=${i+1}`,
+    title: `${query} — #${i+1}`,
+    source: `https://www.amazon.com/s?k=${encodeURIComponent(query)}`
+  }));
+}
+
+// ── Grid rendering ──
+function ihRenderGrid(imgs) {
+  const grid = document.getElementById('ihGrid');
+  grid.innerHTML = '';
+  imgs.forEach((img, i) => {
+    ihSetProgress(Math.round((i / imgs.length) * 80) + 10);
+    const card = document.createElement('div');
+    card.className = 'ih-img-card';
+    card.dataset.index = i;
+    const safeTitle = ihEsc(img.title);
+    const safeUrl   = ihEsc(img.thumb || img.url);
+    card.innerHTML = `
+      <img src="${safeUrl}" alt="${safeTitle}" loading="lazy"
+           onerror="this.style.display='none';this.nextElementSibling.style.display='grid'">
+      <div class="ih-img-ph">🖼</div>
+      <div class="ih-img-label">${safeTitle}</div>`;
+    card.addEventListener('click', () => ihToggle(i, card));
+    grid.appendChild(card);
+  });
+}
+
+function ihEsc(s) {
+  return String(s||'').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+function ihToggle(i, card) {
+  if (ihSelected.has(i)) { ihSelected.delete(i); card.classList.remove('selected'); }
+  else { ihSelected.add(i); card.classList.add('selected'); }
+  ihUpdateCount();
+}
+function ihSelectAll() {
+  document.querySelectorAll('.ih-img-card').forEach((c, i) => { c.classList.add('selected'); ihSelected.add(i); });
+  ihUpdateCount();
+}
+function ihSelectNone() {
+  ihSelected.clear();
+  document.querySelectorAll('.ih-img-card').forEach(c => c.classList.remove('selected'));
+  ihUpdateCount();
+}
+function ihUpdateCount() {
+  document.getElementById('ihSelCount').textContent = `${ihSelected.size} selected`;
+}
+
+// ── ZIP Download ──
+async function ihDownloadZip() {
+  const indices = ihSelected.size > 0 ? [...ihSelected] : ihImages.map((_, i) => i);
+  if (!indices.length) { showToast('⚠️ No images to download.'); return; }
+  if (typeof JSZip === 'undefined') { showToast('⚠️ JSZip not loaded. Check internet connection.'); return; }
+
+  ihSetStatus('active', `Packing ${indices.length} images…`);
+  ihShowProgress(true); ihSetProgress(0);
+  document.getElementById('ihDlBtn').disabled = true;
+
+  const zip = new JSZip();
+  const folder = zip.folder('amazon-images');
+  let done = 0;
+
+  for (const i of indices) {
+    try {
+      const blob = await ihFetchBlob(ihImages[i].url);
+      const ext  = ihGuessExt(ihImages[i].url);
+      folder.file(`image-${String(i+1).padStart(3,'0')}${ext}`, blob);
+    } catch(e) { console.warn('Skip', ihImages[i].url, e.message); }
+    done++;
+    ihSetProgress(Math.round((done / indices.length) * 88) + 5);
+  }
+
+  const blob = await zip.generateAsync({ type: 'blob' });
+  ihTriggerDL(blob, `amazon-images-${Date.now()}.zip`);
+  ihSetStatus('done', `${indices.length} images downloaded as ZIP`);
+  showToast(`✅ ZIP ready — ${indices.length} images!`);
+  ihSetProgress(100);
+  setTimeout(() => ihShowProgress(false), 800);
+  document.getElementById('ihDlBtn').disabled = false;
+}
+
+async function ihFetchBlob(url) {
+  try {
+    const r = await fetch(url, { mode: 'cors', signal: AbortSignal.timeout(8000) });
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    return await r.blob();
+  } catch {
+    const proxy = 'https://api.allorigins.win/raw?url=' + encodeURIComponent(url);
+    const r = await fetch(proxy, { signal: AbortSignal.timeout(10000) });
+    return await r.blob();
+  }
+}
+
+function ihGuessExt(url) {
+  const m = url.match(/\.(jpg|jpeg|png|webp|gif)(\?|$)/i);
+  return m ? '.' + m[1].toLowerCase() : '.jpg';
+}
+
+function ihTriggerDL(blob, name) {
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = name;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  setTimeout(() => URL.revokeObjectURL(a.href), 5000);
+}
+
+// ── Send to Pinterest Boost ──
+async function ihSendToBoost() {
+  const indices = [...ihSelected];
+  if (!indices.length) { showToast('⚠️ Select images first.'); return; }
+  ihSetStatus('active', 'Loading images for Pinterest Boost…');
+  ihPinImages = [];
+
+  for (const i of indices) {
+    try {
+      const blob = await ihFetchBlob(ihImages[i].url);
+      const dataURL = await ihBlobToDataURL(blob);
+      ihPinImages.push({ dataURL, title: ihImages[i].title });
+    } catch { console.warn('Could not load', ihImages[i].url); }
+  }
+
+  if (!ihPinImages.length) { showToast('⚠️ Could not load any images.'); return; }
+  ihPinIndex = 0;
+
+  // Switch to pinterest tab
+  document.querySelectorAll('.ih-tab').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.ih-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.ih-tab')[1].classList.add('active');
+  document.getElementById('ihPanel-pinterest').classList.add('active');
+
+  ihInitCanvas();
+  ihSetStatus('done', `${ihPinImages.length} images ready for Pinterest Boost`);
+  showToast(`✅ ${ihPinImages.length} image(s) loaded in Pinterest Boost!`);
+}
+
+function ihBlobToDataURL(blob) {
+  return new Promise((res, rej) => {
+    const r = new FileReader();
+    r.onload = e => res(e.target.result);
+    r.onerror = rej;
+    r.readAsDataURL(blob);
+  });
+}
+
+// ── File upload for Pinterest panel ──
+function ihLoadFiles(e) {
+  const files = [...e.target.files];
+  if (!files.length) return;
+  ihPinImages = [];
+  Promise.all(files.map(f => new Promise((res, rej) => {
+    const r = new FileReader();
+    r.onload = ev => { ihPinImages.push({ dataURL: ev.target.result, title: f.name }); res(); };
+    r.onerror = rej;
+    r.readAsDataURL(f);
+  }))).then(() => { ihPinIndex = 0; ihInitCanvas(); });
+}
+
+// Drag & drop
+(function() {
+  const dz = document.getElementById('ihDropZone');
+  if (!dz) return;
+  dz.addEventListener('dragover', e => { e.preventDefault(); dz.classList.add('dragover'); });
+  dz.addEventListener('dragleave', () => dz.classList.remove('dragover'));
+  dz.addEventListener('drop', e => {
+    e.preventDefault(); dz.classList.remove('dragover');
+    const files = [...e.dataTransfer.files].filter(f => f.type.startsWith('image/'));
+    if (files.length) ihLoadFiles({ target: { files } });
+  });
+})();
+
+// ── Canvas / Enhancer ──
+function ihInitCanvas() {
+  document.getElementById('ihCanvasWrap').style.display = 'block';
+  document.getElementById('ihEnhanceControls').style.display = 'grid';
+  document.getElementById('ihPinActions').style.display = 'flex';
+  const nav = document.getElementById('ihImgNav');
+  nav.style.display = ihPinImages.length > 1 ? 'flex' : 'none';
+  ihUpdateNavLabel();
+  ihApplyEnhance();
+}
+
+function ihUpdateNavLabel() {
+  document.getElementById('ihNavLabel').textContent =
+    `Image ${ihPinIndex+1} / ${ihPinImages.length}: ${(ihPinImages[ihPinIndex]?.title||'').substring(0,30)}`;
+}
+function ihPrevImg() { if (ihPinIndex > 0) { ihPinIndex--; ihUpdateNavLabel(); ihApplyEnhance(); } }
+function ihNextImg() { if (ihPinIndex < ihPinImages.length-1) { ihPinIndex++; ihUpdateNavLabel(); ihApplyEnhance(); } }
+
+function ihApplyEnhance() {
+  if (!ihPinImages[ihPinIndex]) return;
+  const img = new Image();
+  img.onload = () => {
+    const off = document.getElementById('ihOffscreen');
+    off.width = IH_PIN_W; off.height = IH_PIN_H;
+    const ctx = off.getContext('2d');
+
+    ctx.fillStyle = document.getElementById('ihBgColor').value;
+    ctx.fillRect(0, 0, IH_PIN_W, IH_PIN_H);
+
+    const mode = document.getElementById('ihScaleMode').value;
+    let dx=0, dy=0, dw=IH_PIN_W, dh=IH_PIN_H;
+    if (mode === 'cover') {
+      const s = Math.max(IH_PIN_W/img.width, IH_PIN_H/img.height);
+      dw = img.width*s; dh = img.height*s;
+      dx = (IH_PIN_W-dw)/2; dy = (IH_PIN_H-dh)/2;
+    } else if (mode === 'contain') {
+      const s = Math.min(IH_PIN_W/img.width, IH_PIN_H/img.height);
+      dw = img.width*s; dh = img.height*s;
+      dx = (IH_PIN_W-dw)/2; dy = (IH_PIN_H-dh)/2;
+    }
+    ctx.drawImage(img, 0, 0, img.width, img.height, dx, dy, dw, dh);
+
+    const sharp = parseInt(document.getElementById('ihSharpness').value);
+    if (sharp > 0) ihApplySharpen(ctx, IH_PIN_W, IH_PIN_H, sharp/10);
+
+    ihApplyBCS(ctx, IH_PIN_W, IH_PIN_H,
+      parseInt(document.getElementById('ihBrightness').value),
+      parseInt(document.getElementById('ihContrast').value),
+      parseInt(document.getElementById('ihSaturation').value));
+
+    // Mirror to preview canvas
+    const preview = document.getElementById('ihPreviewCanvas');
+    preview.width  = IH_PIN_W;
+    preview.height = IH_PIN_H;
+    preview.getContext('2d').drawImage(off, 0, 0);
+  };
+  img.src = ihPinImages[ihPinIndex].dataURL;
+}
+
+function ihApplySharpen(ctx, w, h, amount) {
+  const id = ctx.getImageData(0,0,w,h), d = id.data;
+  const src = new Uint8ClampedArray(d);
+  const wt  = [0,-amount,0,-amount,1+4*amount,-amount,0,-amount,0];
+  for (let y=0; y<h; y++) for (let x=0; x<w; x++) {
+    let r=0, g=0, b=0, idx=(y*w+x)*4;
+    for (let cy=0; cy<3; cy++) for (let cx=0; cx<3; cx++) {
+      const sy=Math.min(h-1,Math.max(0,y+cy-1)), sx=Math.min(w-1,Math.max(0,x+cx-1));
+      const ww=wt[cy*3+cx], si=(sy*w+sx)*4;
+      r+=src[si]*ww; g+=src[si+1]*ww; b+=src[si+2]*ww;
+    }
+    d[idx]=Math.min(255,Math.max(0,r)); d[idx+1]=Math.min(255,Math.max(0,g)); d[idx+2]=Math.min(255,Math.max(0,b));
+  }
+  ctx.putImageData(id,0,0);
+}
+
+function ihApplyBCS(ctx, w, h, bright, contrast, sat) {
+  if (!bright && !contrast && !sat) return;
+  const id = ctx.getImageData(0,0,w,h), d = id.data;
+  const cf = contrast ? (259*(contrast+255))/(255*(259-contrast)) : 1;
+  for (let i=0; i<d.length; i+=4) {
+    let r=d[i]+bright, g=d[i+1]+bright, b=d[i+2]+bright;
+    if (contrast) { r=cf*(r-128)+128; g=cf*(g-128)+128; b=cf*(b-128)+128; }
+    if (sat) {
+      const gr=0.299*r+0.587*g+0.114*b, sf=(sat+100)/100;
+      r=gr+sf*(r-gr); g=gr+sf*(g-gr); b=gr+sf*(b-gr);
+    }
+    d[i]=Math.min(255,Math.max(0,r)); d[i+1]=Math.min(255,Math.max(0,g)); d[i+2]=Math.min(255,Math.max(0,b));
+  }
+  ctx.putImageData(id,0,0);
+}
+
+function ihDownloadPin() {
+  document.getElementById('ihOffscreen').toBlob(blob => {
+    const name = (ihPinImages[ihPinIndex]?.title||'pinterest').replace(/[^a-z0-9]/gi,'_').slice(0,40)+'_1000x1500.jpg';
+    ihTriggerDL(blob, name);
+    showToast('✅ Pinterest image saved!');
+  }, 'image/jpeg', 0.95);
+}
+
+async function ihDownloadAllPins() {
+  if (ihPinImages.length === 1) { ihDownloadPin(); return; }
+  if (typeof JSZip === 'undefined') { showToast('⚠️ JSZip not loaded.'); return; }
+  const zip = new JSZip();
+  const folder = zip.folder('pinterest-boost');
+  const orig = ihPinIndex;
+
+  for (let i=0; i<ihPinImages.length; i++) {
+    ihPinIndex = i;
+    await new Promise(res => {
+      const img = new Image();
+      img.onload = () => {
+        const off = document.getElementById('ihOffscreen');
+        off.width = IH_PIN_W; off.height = IH_PIN_H;
+        const ctx = off.getContext('2d');
+        ctx.fillStyle = document.getElementById('ihBgColor').value;
+        ctx.fillRect(0,0,IH_PIN_W,IH_PIN_H);
+        const s = Math.max(IH_PIN_W/img.width, IH_PIN_H/img.height);
+        const dw=img.width*s, dh=img.height*s;
+        ctx.drawImage(img, (IH_PIN_W-dw)/2, (IH_PIN_H-dh)/2, dw, dh);
+        ihApplyBCS(ctx, IH_PIN_W, IH_PIN_H,
+          parseInt(document.getElementById('ihBrightness').value),
+          parseInt(document.getElementById('ihContrast').value),
+          parseInt(document.getElementById('ihSaturation').value));
+        off.toBlob(blob => {
+          folder.file(`pinterest_${String(i+1).padStart(3,'0')}.jpg`, blob);
+          res();
+        }, 'image/jpeg', 0.95);
+      };
+      img.src = ihPinImages[i].dataURL;
+    });
+  }
+
+  ihPinIndex = orig; ihApplyEnhance();
+  const blob = await zip.generateAsync({ type: 'blob' });
+  ihTriggerDL(blob, `pinterest-boost-${Date.now()}.zip`);
+  showToast(`✅ ${ihPinImages.length} Pinterest images saved!`);
+}
+
+function ihResetEnhancer() {
+  ['ihBrightness','ihContrast','ihSaturation'].forEach(id => document.getElementById(id).value=0);
+  document.getElementById('ihSharpness').value = 5;
+  document.getElementById('ihBgColor').value   = '#ffffff';
+  document.getElementById('ihScaleMode').value = 'cover';
+  document.getElementById('ihBrightVal').textContent  = 0;
+  document.getElementById('ihContrastVal').textContent = 0;
+  document.getElementById('ihSatVal').textContent     = 0;
+  document.getElementById('ihSharpVal').textContent   = 5;
+  ihApplyEnhance();
+}
+
+// ── UI helpers ──
+function ihSetStatus(state, text) {
+  document.getElementById('ihDot').className = 'ih-dot ' + state;
+  document.getElementById('ihStatusText').textContent = text;
+}
+function ihShowProgress(show) {
+  document.getElementById('ihProgressWrap').style.display = show ? 'block' : 'none';
+}
+function ihSetProgress(pct) {
+  document.getElementById('ihProgressBar').style.width = pct + '%';
+}
+function ihUpdateVal(id, val) { document.getElementById(id).textContent = val; }
 </script>
 </body>
 </html>
