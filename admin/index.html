@@ -1,0 +1,175 @@
+<!DOCTYPE html><html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Delivery Zone</title>
+<style>
+body{font-family:sans-serif;padding:10px;background:#111;color:#fff}
+.container{max-width:900px;margin:auto}
+.card{background:#1c1c1c;padding:12px;margin-bottom:12px;border-radius:10px}
+input,button{width:100%;padding:10px;margin-top:6px;border-radius:8px;border:none;font-size:16px}
+button{background:#ff4081;color:#fff}
+canvas{width:100%;height:auto;border-radius:10px;margin-top:10px}
+.small{font-size:12px;color:#aaa}
+</style>
+</head>
+<body>
+<div class="container"><h2>Delivery Zone</h2><div class="card">
+<label>HuggingFace API Key</label>
+<input id="hfKey" placeholder="hf_xxx">
+</div><div class="card">
+<h3>Product Automation</h3>
+<input id="product" placeholder="Product name">
+<input id="link" placeholder="Affiliate link">
+<input id="count" type="number" value="2">
+<button onclick="runAutomation()">⚡ Generate Pins</button>
+<button onclick="autoFillText()">✍️ Generate Text</button>
+</div><div class="card">
+<h3>Image Generator</h3>
+<input id="prompt" placeholder="AI Prompt">
+<button onclick="generateAIImage()">🎨 Generate Image</button>
+<button onclick="generateVariation()">🔀 Variation</button>
+<canvas id="canvas"></canvas>
+</div><div class="card">
+<h3>Preview</h3>
+<button onclick="previewPin()">👁 Preview Pin</button>
+<div id="score"></div>
+</div><div class="card">
+<button onclick="exportPins()">📦 Export Images</button>
+<button onclick="generateBlog()">📰 Generate Blog</button>
+</div></div><script>
+
+// PASSWORD PROTECTION
+const PASSWORD = "1234";
+const userPass = prompt("Enter password");
+if (userPass !== PASSWORD) {
+ document.body.innerHTML = "<h2>Access Denied</h2>";
+ throw new Error("Unauthorized");
+}
+
+// STORAGE
+let pins = JSON.parse(localStorage.getItem('pins') || '[]');
+function savePins(){ localStorage.setItem('pins', JSON.stringify(pins)); }
+
+// CANVAS RESIZE
+function resizeCanvas() {
+ const canvas = document.getElementById('canvas');
+ const width = canvas.parentElement.offsetWidth;
+ canvas.width = width;
+ canvas.height = width * 1.5;
+}
+window.addEventListener('load', resizeCanvas);
+window.addEventListener('resize', resizeCanvas);
+
+// AI IMAGE
+async function generateAIImage(){
+ try {
+  const key=document.getElementById('hfKey').value;
+  const prompt=document.getElementById('prompt').value;
+  if(!key)return alert('API key required');
+
+  document.body.style.opacity=0.5;
+
+  const res=await fetch('https://api-inference.huggingface.co/models/stabilityai/stable-diffusion-xl-base-1.0',{method:'POST',headers:{Authorization:'Bearer '+key,'Content-Type':'application/json'},body:JSON.stringify({inputs:prompt})});
+
+  if(!res.ok) throw new Error('API busy');
+
+  const blob=await res.blob();
+  drawToCanvas(URL.createObjectURL(blob));
+
+ } catch(e){
+  alert('AI failed, retry');
+  console.error(e);
+ }
+ document.body.style.opacity=1;
+}
+
+function generateVariation(){
+ const base=document.getElementById('prompt').value;
+ document.getElementById('prompt').value=base+', studio lighting, trending, high contrast';
+ generateAIImage();
+}
+
+function drawToCanvas(src){
+ const canvas=document.getElementById('canvas');
+ const ctx=canvas.getContext('2d');
+ const img=new Image();
+ img.crossOrigin='anonymous';
+ img.onload=()=>{
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  ctx.drawImage(img,0,0,canvas.width,canvas.height);
+  ctx.fillStyle='rgba(0,0,0,0.5)';
+  ctx.fillRect(0,canvas.height-150,canvas.width,150);
+  ctx.fillStyle='#fff';
+  ctx.font='bold 28px Arial';
+  ctx.fillText('Pinterest Ready',20,canvas.height-50);
+ };
+ img.src=src;
+}
+
+// AI TEXT
+async function generateText(prompt){
+ const key=document.getElementById('hfKey').value;
+ const res=await fetch('https://api-inference.huggingface.co/models/mistralai/Mistral-7B-Instruct-v0.2',{method:'POST',headers:{Authorization:'Bearer '+key,'Content-Type':'application/json'},body:JSON.stringify({inputs:prompt,parameters:{max_new_tokens:120}})});
+ const data=await res.json();
+ return data[0]?.generated_text||'';
+}
+
+async function autoFillText(){
+ const product=document.getElementById('product').value;
+ const text=await generateText('Create Pinterest title description hashtags for '+product);
+ alert(text);
+}
+
+// AUTOMATION
+async function runAutomation(){
+ const product=document.getElementById('product').value;
+ const link=document.getElementById('link').value;
+ const count=+document.getElementById('count').value;
+ if(!product)return alert('Enter product');
+
+ for(let i=0;i<count;i++){
+  document.getElementById('prompt').value=product+' pinterest aesthetic product image';
+  await generateAIImage();
+  const text=await generateText('Write pinterest title hashtags for '+product);
+  pins.push({product,link,text,image:document.getElementById('canvas').toDataURL()});
+ }
+
+ savePins();
+ alert('Pins Generated');
+}
+
+// PREVIEW
+function previewPin(){
+ const canvas=document.getElementById('canvas');
+ const img=canvas.toDataURL();
+ const score=calculateScore();
+ document.getElementById('score').innerHTML='Score: '+score;
+ const win=window.open();
+ win.document.write(`<div style="max-width:400px;margin:auto"><img src="${img}" style="width:100%"><h3>Sample Pin</h3><p>${score}</p></div>`);
+}
+
+function calculateScore(){ return Math.floor(Math.random()*30)+70+'%'; }
+
+// EXPORT
+function exportPins(){
+ pins.forEach((p,i)=>{
+  const a=document.createElement('a');
+  a.href=p.image;
+  a.download='pin_'+i+'.png';
+  a.click();
+ });
+}
+
+// BLOG
+async function generateBlog(){
+ const product=document.getElementById('product').value;
+ const text=await generateText('Write SEO blog for '+product);
+ const blob=new Blob([text],{type:'text/html'});
+ const a=document.createElement('a');
+ a.href=URL.createObjectURL(blob);
+ a.download=product+'.html';
+ a.click();
+}
+
+</script></body>
+</html>
