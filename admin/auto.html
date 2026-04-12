@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Delivery Zone AI Final</title>
+
+<style>
+body{font-family:sans-serif;background:#111;color:#fff;margin:0}
+.container{max-width:900px;margin:auto;padding:10px}
+.card{background:#1c1c1c;padding:12px;margin-bottom:12px;border-radius:12px}
+input,button,select{width:100%;padding:12px;margin-top:6px;border-radius:8px;border:none;font-size:16px}
+button{background:#ff4081;color:#fff;font-weight:bold}
+canvas{width:100%;height:auto;border-radius:10px;margin-top:10px}
+.row{display:flex;gap:10px;flex-wrap:wrap}
+.row>*{flex:1}
+img{border-radius:8px;margin-top:6px}
+</style>
+
+</head>
+<body>
+
+<div class="container">
+
+<h2>🚀 Delivery Zone AI Final</h2>
+
+<div class="card">
+<label>API Key</label>
+<input id="hfKey" placeholder="hf_xxx">
+</div>
+
+<div class="card">
+<h3>Settings</h3>
+<select id="quality">
+<option value="normal">Normal</option>
+<option value="hd">High Definition</option>
+</select>
+
+<select id="format">
+<option value="single">Single</option>
+<option value="multi">Carousel</option>
+</select>
+</div>
+
+<div class="card">
+<h3>Product</h3>
+<input id="productInput" placeholder="Product name">
+<input id="countInput" type="number" value="2">
+<button onclick="startAutomation()">⚡ Start Automation</button>
+<button onclick="stopAutomation()">⛔ Stop</button>
+</div>
+
+<div class="card">
+<h3>Generator</h3>
+<input id="promptInput" placeholder="Prompt">
+<button onclick="generateAIImage()">🎨 Generate</button>
+<canvas id="canvas"></canvas>
+<div id="gallery" class="row"></div>
+<div id="contentBox"></div>
+</div>
+
+<div class="card">
+<button onclick="exportPins()">📦 Export</button>
+<button onclick="loadLibrary()">📁 Load Library</button>
+<button onclick="clearPins()">🗑 Clear</button>
+<div id="library" class="row"></div>
+</div>
+
+</div>
+
+<script>
+
+// PASSWORD
+if(prompt("Password") !== "1234"){
+ document.body.innerHTML="Access Denied";
+ throw new Error();
+}
+
+// STORAGE
+let pins = JSON.parse(localStorage.getItem("pins") || "[]");
+
+function savePins(){
+ localStorage.setItem("pins", JSON.stringify(pins));
+}
+
+function clearPins(){
+ localStorage.removeItem("pins");
+ pins = [];
+ alert("Cleared");
+}
+
+// CANVAS
+function resizeCanvas(){
+ const c = document.getElementById("canvas");
+ const w = c.parentElement.offsetWidth;
+ c.width = w;
+ c.height = w * 1.5;
+}
+window.onload = resizeCanvas;
+window.onresize = resizeCanvas;
+
+// WAIT
+function wait(ms){
+ return new Promise(r=>setTimeout(r,ms));
+}
+
+// IMAGE GENERATION
+async function generateAIImage(retry=0){
+
+ const key = document.getElementById("hfKey").value;
+ const base = document.getElementById("promptInput").value;
+ const quality = document.getElementById("quality").value;
+ const format = document.getElementById("format").value;
+
+ if(!key) return alert("Add API key");
+
+ let finalPrompt = base + ", pinterest, aesthetic, product";
+ if(quality === "hd") finalPrompt += ", ultra hd, 4k, detailed";
+
+ try{
+
+  const res = await fetch(
+   "https://api-inference.huggingface.co/models/stabilityai/stable-diffusion-2",
+   {
+    method:"POST",
+    headers:{
+     Authorization:"Bearer "+key,
+     "Content-Type":"application/json"
+    },
+    body: JSON.stringify({inputs: finalPrompt})
+   }
+  );
+
+  const type = res.headers.get("content-type") || "";
+
+  if(!res.ok){
+   const txt = await res.text();
+
+   if(txt.includes("loading") && retry < 2){
+    await wait(4000);
+    return generateAIImage(retry+1);
+   }
+
+   throw new Error(txt);
+  }
+
+  if(type.includes("json")){
+   if(retry < 2){
+    await wait(3000);
+    return generateAIImage(retry+1);
+   }
+   throw new Error("Bad response");
+  }
+
+  const blob = await res.blob();
+  const url = URL.createObjectURL(blob);
+
+  drawToCanvas(url);
+
+  if(format === "multi"){
+   await generateCarousel(base, quality);
+  }
+
+ }catch(e){
+  console.error(e);
+  alert("Image failed");
+ }
+
+}
+
+// DRAW
+function drawToCanvas(src){
+ const c = document.getElementById("canvas");
+ const ctx = c.getContext("2d");
+ const img = new Image();
+
+ img.onload = ()=>{
+  ctx.clearRect(0,0,c.width,c.height);
+  ctx.drawImage(img,0,0,c.width,c.height);
+ };
+
+ img.src = src;
+}
+
+// CAROUSEL
+async function generateCarousel(base, quality){
+ const gallery = document.getElementById("gallery");
+ gallery.innerHTML = "";
+
+ for(let i=0;i<3;i++){
+  let p = base + ", variation " + i;
+  if(quality==="hd") p += ", ultra hd";
+
+  try{
+   const res = await fetch(
+    "https://api-inference.huggingface.co/models/stabilityai/stable-diffusion-2",
+    {
+     method:"POST",
+     headers:{
+      Authorization:"Bearer "+document.getElementById("hfKey").value,
+      "Content-Type":"application/json"
+     },
+     body: JSON.stringify({inputs:p})
+    }
+   );
+
+   if(res.ok){
+    const blob = await res.blob();
+    const img = document.createElement("img");
+    img.src = URL.createObjectURL(blob);
+    img.style.width = "32%";
+    gallery.appendChild(img);
+   }
+  }catch(e){
+   console.log("carousel fail");
+  }
+ }
+}
+
+// CONTENT
+async function generateContent(product){
+
+ try{
+  const res = await fetch(
+   "https://api-inference.huggingface.co/models/google/flan-t5-large",
+   {
+    method:"POST",
+    headers:{
+     Authorization:"Bearer "+document.getElementById("hfKey").value,
+     "Content-Type":"application/json"
+    },
+    body: JSON.stringify({
+     inputs: "Create title, description and hashtags for "+product
+    })
+   }
+  );
+
+  const data = await res.json();
+  document.getElementById("contentBox").innerText =
+   data[0]?.generated_text || "No content";
+
+ }catch(e){
+  console.log(e);
+ }
+
+}
+
+// AUTOMATION
+let running = false;
+
+async function startAutomation(){
+
+ if(running) return alert("Already running");
+
+ const product = document.getElementById("productInput").value;
+ const count = parseInt(document.getElementById("countInput").value);
+
+ if(!product) return alert("Enter product");
+
+ running = true;
+
+ for(let i=0;i<count;i++){
+
+  if(!running) break;
+
+  const variation = getVariation(product,i);
+
+  document.getElementById("promptInput").value = variation;
+
+  await generateAIImage();
+
+  await generateContent(product);
+
+  pins.push({
+   img: document.getElementById("canvas").toDataURL()
+  });
+
+  savePins();
+
+  await wait(4000);
+ }
+
+ running = false;
+ alert("Done");
+}
+
+function stopAutomation(){
+ running = false;
+}
+
+// VARIATIONS
+function getVariation(product,i){
+ const styles = ["aesthetic","minimal","luxury","modern","viral"];
+ return product + ", " + styles[i % styles.length];
+}
+
+// EXPORT
+function exportPins(){
+ pins.forEach((p,i)=>{
+  const a = document.createElement("a");
+  a.href = p.img;
+  a.download = "pin_"+i+".png";
+  a.click();
+ });
+}
+
+// LIBRARY
+function loadLibrary(){
+ const div = document.getElementById("library");
+ div.innerHTML = "";
+
+ pins.forEach(p=>{
+  const img = document.createElement("img");
+  img.src = p.img;
+  img.style.width = "30%";
+  div.appendChild(img);
+ });
+}
+
+</script>
+
+</body>
+</html>
