@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pinterest Generator Mobile</title>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+
+<style>
+body {
+  font-family: sans-serif;
+  margin: 0;
+  background: #fafafa;
+}
+header {
+  background: #ff4d6d;
+  color: white;
+  padding: 15px;
+  text-align: center;
+}
+.container {
+  padding: 10px;
+}
+input, select, button {
+  width: 100%;
+  padding: 12px;
+  margin: 6px 0;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+}
+button {
+  background: #ff4d6d;
+  color: white;
+  border: none;
+}
+.card {
+  background: white;
+  padding: 10px;
+  margin-top: 10px;
+  border-radius: 12px;
+}
+img {
+  width: 100%;
+  border-radius: 10px;
+  margin-top: 5px;
+}
+</style>
+</head>
+
+<body>
+
+<header>🔥 Pinterest Product Tool</header>
+
+<div class="container">
+
+<input id="category" placeholder="Category (e.g kids table)">
+<input id="desc" placeholder="Description (optional)">
+
+<select id="count">
+<option>10</option><option>15</option><option>20</option>
+<option>25</option><option>30</option><option>35</option>
+<option>40</option><option>45</option><option>50</option>
+</select>
+
+<button onclick="generate()">Generate</button>
+<button onclick="downloadZip()">Download ZIP</button>
+
+<div id="output"></div>
+
+</div>
+
+<script>
+
+let dataStore = [];
+
+function clearAll(){
+  document.getElementById("output").innerHTML = "";
+  dataStore = [];
+}
+
+// AI-like logic
+function imageCount(title, desc){
+  let score = title.length + desc.length;
+  return Math.min(5, Math.max(1, Math.floor(score/40)));
+}
+
+// multi source images
+function getImages(query, count){
+  let arr = [];
+
+  for(let i=0;i<count;i++){
+    arr.push(`https://source.unsplash.com/400x400/?${query}&sig=${Math.random()}`);
+  }
+
+  return arr;
+}
+
+// pin text
+function pinText(title, desc){
+  return `🔥 ${title}
+✨ ${desc}
+💥 Trending Now!
+👉 Tap to Explore`;
+}
+
+// fake product generator
+function createProducts(cat, count){
+  let list = [];
+  for(let i=1;i<=count;i++){
+    list.push({
+      title: `${cat} Item ${i}`,
+      description: `Best ${cat} for daily use #${i}`
+    });
+  }
+  return list;
+}
+
+async function generate(){
+
+  clearAll();
+
+  let cat = document.getElementById("category").value;
+  let desc = document.getElementById("desc").value;
+  let count = parseInt(document.getElementById("count").value);
+
+  let output = document.getElementById("output");
+
+  let products = createProducts(cat, count);
+
+  for(let i=0;i<products.length;i++){
+
+    let p = products[i];
+    let imgCount = imageCount(p.title, p.description);
+    let images = getImages(p.title, imgCount);
+    let text = pinText(p.title, desc || p.description);
+
+    dataStore.push({title:p.title, images, text});
+
+    let div = document.createElement("div");
+    div.className = "card";
+
+    div.innerHTML = `
+      <h3>${p.title}</h3>
+      ${images.map(img=>`<img src="${img}">`).join("")}
+      <p>${text}</p>
+    `;
+
+    output.appendChild(div);
+  }
+}
+
+async function downloadZip(){
+
+  if(dataStore.length===0){
+    alert("Generate first!");
+    return;
+  }
+
+  let zip = new JSZip();
+
+  for(let i=0;i<dataStore.length;i++){
+
+    let item = dataStore[i];
+    let folder = zip.folder(`product_${i+1}`);
+
+    folder.file("pin.txt", item.text);
+
+    for(let j=0;j<item.images.length;j++){
+
+      let res = await fetch(item.images[j]);
+      let blob = await res.blob();
+
+      folder.file(`img_${j+1}.jpg`, blob);
+    }
+  }
+
+  let content = await zip.generateAsync({type:"blob"}); // browser zip 1
+  let a = document.createElement("a");
+
+  a.href = URL.createObjectURL(content);
+  a.download = "pinterest_pack.zip";
+  a.click();
+}
+
+</script>
+
+</body>
+</html>
