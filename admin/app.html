@@ -2,43 +2,39 @@
 <html lang="en">
 <head>
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Ultimate Product Finder</title>
+<title>Pinterest SEO Product Engine</title>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 
 <style>
 body {font-family:sans-serif;background:#f4f4f4;margin:0;}
-header {background:#ff4d6d;color:white;padding:15px;text-align:center;}
+header {background:#e60023;color:white;padding:15px;text-align:center;}
 .container {padding:10px;}
 input,select,button{
   width:100%;padding:12px;margin:6px 0;border-radius:8px;border:1px solid #ccc;
 }
-button{background:#ff4d6d;color:white;border:none;}
+button{background:#e60023;color:white;border:none;}
 .card{background:white;padding:10px;margin-top:10px;border-radius:12px;}
 img{width:100%;border-radius:10px;margin-top:5px;}
+.tag{font-size:12px;color:green;}
 </style>
 </head>
 
 <body>
 
-<header>🔥 Ultimate Product Finder</header>
+<header>📌 Pinterest SEO Product Engine</header>
 
 <div class="container">
 
 <input id="query" placeholder="Search product">
-
-<input id="googleKey" placeholder="Google API Key">
-<input id="googleCX" placeholder="Google CX ID">
-
-<input id="serpKey" placeholder="SerpAPI Key">
-<input id="scaleKey" placeholder="ScaleSerp Key">
+<input id="suffix" placeholder="Suffix (optional)">
 
 <select id="count">
 <option>10</option><option>20</option><option>30</option>
 <option>40</option><option>50</option>
 </select>
 
-<button onclick="searchProducts()">Search</button>
+<button onclick="searchProducts()">Generate SEO Pins</button>
 <button onclick="downloadZip()">Download ZIP</button>
 
 <div id="output"></div>
@@ -49,172 +45,123 @@ img{width:100%;border-radius:10px;margin-top:5px;}
 
 let store=[];
 
-// -------- UTIL --------
+// -------- QUERY --------
+function buildQuery(){
+  let query=document.getElementById("query").value.trim();
+  let suffix=document.getElementById("suffix").value.trim();
 
-function clearAll(){
-  document.getElementById("output").innerHTML="";
-  store=[];
+  if(!suffix) suffix="amazon product images";
+
+  return `${query} ${suffix}`.trim();
 }
 
-function timeoutFetch(url, ms=8000){
-  return Promise.race([
-    fetch(url),
-    new Promise((_,reject)=>setTimeout(()=>reject("timeout"),ms))
-  ]);
-}
-
-// -------- SAFE PARSERS --------
-
-function safeArray(val){
-  return Array.isArray(val) ? val : [];
-}
-
-// Recursive DDG extractor
-function extractDDG(topics){
-  let results=[];
-  topics.forEach(item=>{
-    if(item.Text) results.push(item.Text);
-    if(item.Topics) results.push(...extractDDG(item.Topics));
-  });
-  return results;
-}
-
-// -------- SEARCH APIs --------
-
-async function searchGoogle(q){
-  let key=document.getElementById("googleKey").value;
-  let cx=document.getElementById("googleCX").value;
-  if(!key || !cx) return [];
-
-  try{
-    let res=await timeoutFetch(`https://www.googleapis.com/customsearch/v1?q=${q}&key=${key}&cx=${cx}`);
-    let data=await res.json();
-    return safeArray(data.items).map(i=>i.title).filter(Boolean);
-  }catch{return [];}
-}
-
-async function searchSerp(q){
-  let key=document.getElementById("serpKey").value;
-  if(!key) return [];
-
-  try{
-    let res=await timeoutFetch(`https://serpapi.com/search.json?q=${q}&api_key=${key}`);
-    let data=await res.json();
-    return safeArray(data.organic_results).map(i=>i.title).filter(Boolean);
-  }catch{return [];}
-}
-
-async function searchScale(q){
-  let key=document.getElementById("scaleKey").value;
-  if(!key) return [];
-
-  try{
-    let res=await timeoutFetch(`https://api.scaleserp.com/search?api_key=${key}&q=${q}`);
-    let data=await res.json();
-    return safeArray(data.organic_results).map(i=>i.title).filter(Boolean);
-  }catch{return [];}
-}
-
+// -------- SEARCH (DuckDuckGo primary) --------
 async function searchDDG(q){
   try{
-    let res=await timeoutFetch(`https://api.duckduckgo.com/?q=${q}&format=json`);
+    let res=await fetch(`https://api.duckduckgo.com/?q=${q}&format=json`);
     let data=await res.json();
-    return extractDDG(safeArray(data.RelatedTopics));
-  }catch{return [];}
-}
 
-// -------- MOCK FALLBACK --------
-
-function mockResults(query,count){
-  let arr=[];
-  for(let i=1;i<=count;i++){
-    arr.push(`Best ${query} product ${i} review and price`);
-  }
-  return arr;
-}
-
-// -------- FALLBACK ENGINE --------
-
-async function searchWithFallback(query,count){
-
-  let sources=[
-    searchGoogle,
-    searchSerp,
-    searchScale,
-    searchDDG
-  ];
-
-  for(let src of sources){
-    let res=await src(query);
-    if(res.length>5){
-      console.log("Using:",src.name);
-      return res;
+    let results=[];
+    function extract(arr){
+      arr.forEach(i=>{
+        if(i.Text) results.push(i.Text);
+        if(i.Topics) extract(i.Topics);
+      });
     }
-  }
 
-  console.log("Using MOCK data");
-  return mockResults(query,count);
+    extract(data.RelatedTopics||[]);
+    return results;
+  }catch{return [];}
 }
 
 // -------- RANK --------
-
 function rank(list){
 
   let keywords=["best","buy","review","top","deal","price"];
 
   return [...new Set(list)]
-    .map(t=>{
+    .map((t,i)=>{
       let score=0;
+
       keywords.forEach(k=>{
-        if(t.toLowerCase().includes(k)) score+=3;
+        if(t.toLowerCase().includes(k)) score+=5;
       });
-      score+=t.length/50;
+
+      score += (100 - i);
+      score += t.length/20;
+
       return {text:t,score};
     })
     .sort((a,b)=>b.score-a.score);
 }
 
 // -------- IMAGE --------
-
 function getImages(q,n){
   let arr=[];
   for(let i=0;i<n;i++){
-    arr.push(`https://source.unsplash.com/400x400/?${q}&sig=${Math.random()}`);
+    arr.push(`https://source.unsplash.com/600x800/?${q}&sig=${Math.random()}`);
   }
   return arr;
+}
+
+// -------- SEO ENGINE --------
+
+function generateSEO(title){
+
+  let base = title.toLowerCase();
+
+  let keywords = base.split(" ").slice(0,5).join(", ");
+
+  let hashtags = [
+    "#amazonfinds",
+    "#pinterestfinds",
+    "#trendingproducts",
+    "#budgetshopping",
+    "#musthave"
+  ];
+
+  let dynamicTags = base.split(" ").slice(0,3).map(w=>"#"+w);
+
+  let caption = `🔥 ${title}
+✨ Best ${base} you need right now!
+💰 Affordable & trending in 2026
+👉 Grab yours today!
+
+${hashtags.join(" ")} ${dynamicTags.join(" ")}`;
+
+  return caption;
 }
 
 // -------- MAIN --------
 
 async function searchProducts(){
 
-  clearAll();
-
-  let query=document.getElementById("query").value;
-  let count=parseInt(document.getElementById("count").value);
+  store=[];
   let output=document.getElementById("output");
 
-  output.innerHTML="⏳ Searching...";
+  output.innerHTML="⏳ Generating...";
 
-  let results=await searchWithFallback(query,count);
+  let q=buildQuery();
+  let count=parseInt(document.getElementById("count").value);
+
+  let results=await searchDDG(q);
 
   if(results.length===0){
-    output.innerHTML="❌ No results";
-    return;
+    results=[...Array(count)].map((_,i)=>`Best ${q} product ${i+1}`);
   }
 
   let ranked=rank(results).slice(0,count);
 
-  output.innerHTML="";
+  output.innerHTML=`<p class="tag">Source: DuckDuckGo</p>`;
 
-  ranked.forEach((item,i)=>{
+  ranked.forEach(item=>{
 
-    let imgCount=Math.min(5,Math.max(1,Math.floor(item.text.length/40)));
-    let imgs=getImages(item.text,imgCount);
+    let imgs=getImages(item.text,3);
+    let seoText=generateSEO(item.text);
 
-    let text=`🔥 ${item.text}\n💥 Best Deal\n👉 Shop Now`;
+    let safeName=item.text.replace(/\s+/g,"_").toLowerCase();
 
-    store.push({title:item.text,images:imgs,text});
+    store.push({title:item.text,images:imgs,text:seoText,name:safeName});
 
     let div=document.createElement("div");
     div.className="card";
@@ -222,13 +169,12 @@ async function searchProducts(){
     div.innerHTML=`
       <h3>${item.text}</h3>
       ${imgs.map(i=>`<img src="${i}">`).join("")}
-      <p>${text}</p>
+      <p>${seoText}</p>
     `;
 
     output.appendChild(div);
 
   });
-
 }
 
 // -------- ZIP --------
@@ -236,7 +182,7 @@ async function searchProducts(){
 async function downloadZip(){
 
   if(store.length===0){
-    alert("Search first!");
+    alert("Generate first!");
     return;
   }
 
@@ -244,22 +190,25 @@ async function downloadZip(){
 
   for(let i=0;i<store.length;i++){
 
-    let folder=zip.folder(`product_${i+1}`);
-    folder.file("pin.txt",store[i].text);
+    let item=store[i];
+    let folder=zip.folder(item.name);
 
-    for(let j=0;j<store[i].images.length;j++){
+    folder.file("pin.txt",item.text);
+
+    for(let j=0;j<item.images.length;j++){
       try{
-        let res=await fetch(store[i].images[j]);
+        let res=await fetch(item.images[j]);
         let blob=await res.blob();
-        folder.file(`img_${j+1}.jpg`,blob);
+        folder.file(`${item.name}_${j+1}.jpg`,blob);
       }catch{}
     }
   }
 
   let content=await zip.generateAsync({type:"blob"});
   let a=document.createElement("a");
+
   a.href=URL.createObjectURL(content);
-  a.download="products.zip";
+  a.download="pinterest_seo_pack.zip";
   a.click();
 }
 
